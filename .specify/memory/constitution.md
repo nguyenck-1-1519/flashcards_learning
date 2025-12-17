@@ -1,50 +1,70 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Flashcards Learning Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Mobile-First Responsive Design
+All UI components must be designed and tested for mobile devices first, then scaled up to desktop. Breakpoints should follow a mobile-first approach with progressive enhancement. Touch interactions must be intuitive and accessible with minimum target sizes of 44x44px. The website must be fully functional on screen sizes from 320px width upward.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Markdown Fidelity
+The markdown renderer must accurately support standard CommonMark specification with extended syntax (tables, task lists, code highlighting). Rendering must preserve the semantic structure and intent of the original markdown. All markdown features used in flashcards must render consistently across different screen sizes and devices.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Performance and User Experience
+Page load time must be under 2 seconds on 3G connections. Markdown rendering should be optimized for instant feedback. Lazy loading should be implemented for images and heavy content. The application should work offline with service workers caching critical resources and flashcard data.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Accessibility First
+All interactive elements must be keyboard navigable. ARIA labels required for screen readers. Color contrast must meet WCAG AA standards (4.5:1 for normal text). Focus indicators must be clearly visible. Semantic HTML must be used throughout.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Progressive Enhancement & Simplicity
+Start with core functionality (markdown display, flashcard navigation) that works without JavaScript. Enhance with interactive features progressively. Keep the codebase simple and maintainable. Avoid over-engineering - YAGNI principles apply. Use vanilla web standards where possible before reaching for frameworks.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technical Standards
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Technology Stack
+- **Frontend**: Modern vanilla JavaScript or lightweight framework (React/Vue if needed)
+- **Markdown Parser**: CommonMark-compliant library (e.g., marked.js, markdown-it)
+- **Styling**: CSS with mobile-first media queries, CSS Grid/Flexbox for layouts
+- **Storage**: LocalStorage or IndexedDB for offline flashcard persistence
+- **Build Tools**: Minimal bundling setup, ES modules preferred
+- **Code Highlighting**: Prism.js or Highlight.js for code blocks in markdown
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### Performance Requirements
+- First Contentful Paint (FCP): < 1.5s
+- Largest Contentful Paint (LCP): < 2.5s
+- Cumulative Layout Shift (CLS): < 0.1
+- Time to Interactive (TTI): < 3.5s on mobile
+- Bundle size: < 100KB gzipped for initial load
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Responsive Breakpoints
+- Mobile: 320px - 767px (default/base styles)
+- Tablet: 768px - 1023px
+- Desktop: 1024px+
+
+## Development Workflow
+
+### Testing Requirements
+- Manual testing on real mobile devices (iOS Safari, Android Chrome)
+- Responsive design testing at key breakpoints
+- Markdown rendering tests for all supported syntax
+- Accessibility testing with screen readers
+- Performance testing with Lighthouse (mobile & desktop)
+
+### Code Quality Standards
+- Semantic, valid HTML5
+- CSS follows BEM or logical naming conventions
+- JavaScript follows ES6+ standards with clear documentation
+- All user-facing text should support internationalization
+- Code must be readable and self-documenting
+
+### Version Control
+- Meaningful commit messages describing changes
+- Feature branches for new functionality
+- Main branch should always be deployable
+- Tag releases with semantic versioning
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution defines the core principles and standards for the Flashcards Learning project. All development decisions should align with these principles, prioritizing mobile experience, markdown rendering accuracy, and user accessibility.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Changes to this constitution should be documented with rationale. When in doubt, choose the simpler solution that best serves mobile users learning with flashcards.
+
+**Version**: 1.0.0 | **Ratified**: 2025-12-17 | **Last Amended**: 2025-12-17
