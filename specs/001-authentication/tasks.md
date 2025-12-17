@@ -17,9 +17,9 @@
 
 **Purpose**: Project initialization and authentication infrastructure
 
-- [ ] T001 Install authentication dependencies (bcryptjs, jose, zod, @vercel/postgres)
-- [ ] T002 [P] Create environment variables template (.env.example) with DATABASE_URL and JWT_SECRET
-- [ ] T003 [P] Setup TypeScript types for auth in types/auth.ts
+- [X] T001 Install authentication dependencies (bcryptjs, jose, zod, @vercel/postgres)
+- [X] T002 [P] Create environment variables template (.env.example) with DATABASE_URL and JWT_SECRET
+- [X] T003 [P] Setup TypeScript types for auth in types/auth.ts
 
 ---
 
@@ -29,15 +29,15 @@
 
 **⚠️ CRITICAL**: No authentication features can work until this phase is complete
 
-- [ ] T004 Create database schema for users table in lib/db/schema.sql
+- [X] T004 Create database schema for users table in lib/db/schema.sql
 - [ ] T005 Run database migration to create users table
-- [ ] T006 [P] Create Zod validation schemas in lib/auth/validation.ts (email, password rules)
+- [X] T006 [P] Create Zod validation schemas in lib/auth/validation.ts (email, password rules)
 - [ ] T007 [P] Write unit tests for validation schemas in tests/unit/auth/validation.test.ts
 - [ ] T008 [P] Write unit tests for password hashing in tests/unit/auth/password.test.ts
 - [ ] T009 [P] Write unit tests for JWT creation/verification in tests/unit/auth/session.test.ts
-- [ ] T010 Implement password hashing utilities in lib/auth/password.ts (hash, compare with bcrypt)
-- [ ] T011 Implement JWT session utilities in lib/auth/session.ts (createSession, verifySession with jose)
-- [ ] T012 [P] Create database query functions in lib/db/queries.ts (createUser, findUserByEmail)
+- [X] T010 Implement password hashing utilities in lib/auth/password.ts (hash, compare with bcrypt)
+- [X] T011 Implement JWT session utilities in lib/auth/session.ts (createSession, verifySession with jose)
+- [X] T012 [P] Create database query functions in lib/db/queries.ts (createUser, findUserByEmail)
 - [ ] T013 [P] Write unit tests for database queries in tests/unit/db/queries.test.ts
 
 **Checkpoint**: Foundation ready - all utilities tested and working
@@ -61,14 +61,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Create PasswordInput component with show/hide toggle in components/auth/PasswordInput.tsx
-- [ ] T019 [US1] Create FormError component for error display in components/auth/FormError.tsx
-- [ ] T020 [US1] Create RegisterForm component with client-side validation in components/auth/RegisterForm.tsx
-- [ ] T021 [US1] Implement register server action in app/actions/auth.ts
-- [ ] T022 [US1] Add duplicate email check in register action
-- [ ] T023 [US1] Create registration page at app/(auth)/register/page.tsx
-- [ ] T024 [US1] Add password strength indicator to RegisterForm
-- [ ] T025 [US1] Ensure registration form uses email keyboard on mobile
+- [X] T018 [US1] Create PasswordInput component with show/hide toggle in components/auth/PasswordInput.tsx
+- [X] T019 [US1] Create FormError component for error display in components/auth/FormError.tsx
+- [X] T020 [US1] Create RegisterForm component with client-side validation in components/auth/RegisterForm.tsx
+- [X] T021 [US1] Implement register server action in app/actions/auth.ts
+- [X] T022 [US1] Add duplicate email check in register action
+- [X] T023 [US1] Create registration page at app/(auth)/register/page.tsx
+- [X] T024 [US1] Add password strength indicator to RegisterForm
+- [X] T025 [US1] Ensure registration form uses email keyboard on mobile
 - [ ] T026 [US1] Test registration on mobile viewport (320px, 768px)
 
 **Verify**: Run tests from T014-T017, all should PASS (green state)
@@ -94,13 +94,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] Create LoginForm component in components/auth/LoginForm.tsx
-- [ ] T032 [US2] Implement login server action in app/actions/auth.ts
-- [ ] T033 [US2] Add credential verification in login action (email + password)
-- [ ] T034 [US2] Set httpOnly JWT cookie on successful login in lib/auth/session.ts
-- [ ] T035 [US2] Create login page at app/(auth)/login/page.tsx
-- [ ] T036 [US2] Add generic error message for failed login attempts
-- [ ] T037 [US2] Update last_login timestamp in database on successful login
+- [X] T031 [US2] Create LoginForm component in components/auth/LoginForm.tsx
+- [X] T032 [US2] Implement login server action in app/actions/auth.ts
+- [X] T033 [US2] Add credential verification in login action (email + password)
+- [X] T034 [US2] Set httpOnly JWT cookie on successful login in lib/auth/session.ts
+- [X] T035 [US2] Create login page at app/(auth)/login/page.tsx
+- [X] T036 [US2] Add generic error message for failed login attempts
+- [X] T037 [US2] Update last_login timestamp in database on successful login
 - [ ] T038 [US2] Test login form on mobile viewport
 
 **Verify**: Run tests from T027-T030, all should PASS (green state)
@@ -125,12 +125,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T042 [US3] Create Next.js middleware in middleware.ts for route protection
-- [ ] T043 [US3] Implement getSession utility to retrieve current user from JWT in lib/auth/session.ts
-- [ ] T044 [US3] Add JWT verification middleware for protected routes
-- [ ] T045 [US3] Create auth layout that redirects logged-in users away from auth pages in app/(auth)/layout.tsx
+- [X] T042 [US3] Create Next.js middleware in middleware.ts for route protection
+- [X] T043 [US3] Implement getSession utility to retrieve current user from JWT in lib/auth/session.ts
+- [X] T044 [US3] Add JWT verification middleware for protected routes
+- [X] T045 [US3] Create auth layout that redirects logged-in users away from auth pages in app/(auth)/layout.tsx
 - [ ] T046 [US3] Handle expired token scenario (redirect to login with message)
-- [ ] T047 [US3] Add session check on dashboard page load
+- [X] T047 [US3] Add session check on dashboard page load
 - [ ] T048 [US3] Test session persistence across multiple tabs
 
 **Verify**: Run tests from T039-T041, all should PASS (green state)
@@ -155,10 +155,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T052 [US4] Create logout API route at app/api/auth/logout/route.ts
-- [ ] T053 [US4] Implement cookie clearing logic in logout route
-- [ ] T054 [US4] Add logout button to dashboard/navigation
-- [ ] T055 [US4] Redirect to login page after logout
+- [X] T052 [US4] Create logout API route at app/api/auth/logout/route.ts
+- [X] T053 [US4] Implement cookie clearing logic in logout route
+- [X] T054 [US4] Add logout button to dashboard/navigation
+- [X] T055 [US4] Redirect to login page after logout
 - [ ] T056 [US4] Prevent back button access after logout
 - [ ] T057 [US4] Test logout synchronization across tabs
 

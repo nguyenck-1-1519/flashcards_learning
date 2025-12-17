@@ -1,0 +1,50 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js build outputs
+/.next/
+/out/
+.next/
+build/
+dist/
+
+# Environment variables (never commit secrets)
+.env
+.env*.local
+.env.production
+.env.development
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.suo
+*.user
+
+# Temporary files
+*.tmp
+.cache/
+.temp/
+
+# Vercel
+.vercel
