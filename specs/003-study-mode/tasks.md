@@ -1,0 +1,503 @@
+# Tasks: Study Mode with Spaced Repetition
+
+**Input**: Design documents from `/specs/003-study-mode/`
+**Prerequisites**: plan.md, spec.md, 001-authentication, 002-dashboard-deck-management (need decks and cards)
+
+**Tests**: TDD approach - all tests written and verified to FAIL before implementation, with heavy focus on SM-2 algorithm testing
+
+**Organization**: Tasks grouped by user story for independent implementation
+
+## Format: `[ID] [P?] [Story] Description`
+
+- **[P]**: Can run in parallel (different files, no dependencies)
+- **[Story]**: Which user story (US1, US2, US3, US4, US5, US6)
+- All paths are absolute from project root
+
+## Phase 1: Setup (Shared Infrastructure)
+
+**Purpose**: Study mode infrastructure and markdown rendering setup
+
+- [ ] T001 Install dependencies (marked, isomorphic-dompurify, highlight.js, framer-motion, date-fns)
+- [ ] T002 [P] Create TypeScript types for Card with SM-2 fields in types/card.ts
+- [ ] T003 [P] Create TypeScript types for StudySession and Rating enum in types/study.ts
+- [ ] T004 [P] Create Zod validation schema for card content in lib/validations/card.ts
+
+---
+
+## Phase 2: Foundational (Blocking Prerequisites)
+
+**Purpose**: Database, SM-2 algorithm, and markdown rendering - MUST complete before study features
+
+**⚠️ CRITICAL**: No study features can work until SM-2 algorithm and database are ready
+
+### SM-2 Algorithm - HEAVY TESTING REQUIRED
+
+- [ ] T005 [P] Write comprehensive unit tests for SM-2 algorithm in tests/unit/study/sm2.test.ts
+  - Test all 4 ratings (Again/Hard/Good/Easy)
+  - Test new card initialization (ease=2.5, interval=0, reps=0)
+  - Test "Again" rating (interval=0, reset reps, decrease ease)
+  - Test "Hard" rating (interval * 1.2, decrease ease)
+  - Test "Good" rating (interval * ease, maintain ease)
+  - Test "Easy" rating (interval * ease * 1.3, increase ease)
+  - Test ease factor boundaries (1.3 min, 3.0 max)
+  - Test minimum interval (1 day except "Again")
+  - Test first review intervals (1 day for Good, 4 days for Easy)
+  - Test second review intervals (6 days for Good)
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+- [ ] T006 Implement SM-2 algorithm in lib/study/sm2.ts with calculateNextReview function
+- [ ] T007 Implement Rating enum (Again=0, Hard=1, Good=2, Easy=3)
+- [ ] T008 Test SM-2 with edge cases (very long intervals, multiple consecutive "Again")
+
+**Verify**: Run tests from T005, all should PASS (green state)
+
+### Database Setup
+
+- [ ] T009 Create database schema for cards table with SM-2 fields in lib/db/schema.sql
+- [ ] T010 Add constraints for SM-2 fields (ease_factor 1.3-3.0, interval >= 0)
+- [ ] T011 Run database migration to create cards table
+- [ ] T012 [P] Write unit tests for card queries in tests/unit/db/cards.test.ts
+- [ ] T013 [P] Write unit tests for getDueCards query in tests/unit/db/study.test.ts
+- [ ] T014 Create card CRUD query functions in lib/db/queries/cards.ts
+- [ ] T015 Create study-specific queries in lib/db/queries/study.ts (getDueCards, updateCardSchedule)
+
+**Verify**: Run tests from T012-T013, all should PASS (green state)
+
+### Markdown Rendering
+
+- [ ] T016 [P] Write unit tests for markdown parsing in tests/unit/markdown/parser.test.ts
+- [ ] T017 [P] Write unit tests for HTML sanitization in tests/unit/markdown/sanitize.test.ts
+- [ ] T018 Configure marked with syntax highlighting (highlight.js)
+- [ ] T019 Implement markdown parser in lib/markdown/parser.ts
+- [ ] T020 Implement HTML sanitization in lib/markdown/sanitize.ts (DOMPurify)
+- [ ] T021 Test markdown with various syntax (headers, lists, code blocks, tables)
+- [ ] T022 Test XSS prevention (script tags, event handlers)
+
+**Verify**: Run tests from T016-T017, all should PASS (green state)
+
+**Checkpoint**: SM-2 algorithm tested and working, markdown rendering secure, database ready
+
+---
+
+## Phase 3: User Story 1 - Start Study Session (Priority: P1) 🎯 MVP
+
+**Goal**: Users can start study session with due cards
+
+**Independent Test**: Open deck with cards → click "Study" → first card's front side displays
+
+### Tests for User Story 1 - Write FIRST, verify they FAIL
+
+- [ ] T023 [P] [US1] Write integration test for starting study session in tests/integration/study/start-session.test.ts
+- [ ] T024 [P] [US1] Write test for due cards query ordering (new cards first, then by date) in tests/integration/study/card-queue.test.ts
+- [ ] T025 [P] [US1] Write test for empty study state (no cards due) in tests/integration/study/empty-state.test.ts
+- [ ] T026 [P] [US1] Write component test for EmptyStudyState in tests/unit/components/EmptyStudyState.test.tsx
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation for User Story 1
+
+- [ ] T027 [US1] Create EmptyStudyState component in components/study/EmptyStudyState.tsx
+- [ ] T028 [US1] Create study page at app/decks/[deckId]/study/page.tsx
+- [ ] T029 [US1] Implement session initialization (fetch due cards from database)
+- [ ] T030 [US1] Create card queue logic in lib/study/queue.ts (new cards first, then by next_review)
+- [ ] T031 [US1] Add "Study" button to deck detail page
+- [ ] T032 [US1] Handle case when no cards are due (show EmptyStudyState)
+- [ ] T033 [US1] Add "Study All Cards Anyway" option
+- [ ] T034 [US1] Display first card's front side
+- [ ] T035 [US1] Test session starts with correct card order
+
+**Verify**: Run tests from T023-T026, all should PASS (green state)
+
+**Checkpoint**: Users can start study sessions
+
+---
+
+## Phase 4: User Story 2 - Flip Card to See Answer (Priority: P1) 🎯 MVP
+
+**Goal**: Users can flip cards to reveal answers with smooth animation
+
+**Independent Test**: See card front → click/tap/spacebar → card flips → see back with markdown
+
+### Tests for User Story 2 - Write FIRST, verify they FAIL
+
+- [ ] T036 [P] [US2] Write component test for StudyCard flip animation in tests/unit/components/StudyCard.test.tsx
+- [ ] T037 [P] [US2] Write component test for CardFront rendering markdown in tests/unit/components/CardFront.test.tsx
+- [ ] T038 [P] [US2] Write component test for CardBack rendering markdown in tests/unit/components/CardBack.test.tsx
+- [ ] T039 [P] [US2] Write E2E test for flip interactions (button, tap, spacebar) in tests/e2e/study-flip.spec.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation for User Story 2
+
+- [ ] T040 [US2] Create MarkdownRenderer component in components/markdown/MarkdownRenderer.tsx
+- [ ] T041 [US2] Add CSS for markdown content (responsive, mobile-friendly)
+- [ ] T042 [US2] Create CardFront component with MarkdownRenderer in components/study/CardFront.tsx
+- [ ] T043 [US2] Create CardBack component with MarkdownRenderer in components/study/CardBack.tsx
+- [ ] T044 [US2] Create StudyCard component with flip state in components/study/StudyCard.tsx
+- [ ] T045 [US2] Implement 3D flip animation (180deg Y-axis rotation, 300ms)
+- [ ] T046 [US2] Use CSS transform3d for hardware acceleration
+- [ ] T047 [US2] Add flip triggers: button click, card tap (mobile), spacebar key
+- [ ] T048 [US2] Disable interactions during flip animation
+- [ ] T049 [US2] Test flip animation on iOS Safari (target: 60fps)
+- [ ] T050 [US2] Test flip animation on Android Chrome (target: 60fps)
+- [ ] T051 [US2] Test markdown renders correctly on both sides
+- [ ] T052 [US2] Test code blocks have syntax highlighting
+
+**Verify**: Run tests from T036-T039, all should PASS (green state)
+
+**Checkpoint**: Card flipping works smoothly with markdown rendering
+
+---
+
+## Phase 5: User Story 3 - Rate Card Difficulty (Priority: P1) 🎯 MVP
+
+**Goal**: Users rate cards, SM-2 updates schedule, next card appears
+
+**Independent Test**: Flip card → click rating button → card schedule updates → next card shows
+
+### Tests for User Story 3 - Write FIRST, verify they FAIL
+
+- [ ] T053 [P] [US3] Write component test for RatingButtons rendering in tests/unit/components/RatingButtons.test.tsx
+- [ ] T054 [P] [US3] Write integration test for rating updating card schedule in tests/integration/study/rate-card.test.ts
+- [ ] T055 [P] [US3] Write integration test for "Again" card re-queuing in tests/integration/study/rate-card.test.ts
+- [ ] T056 [P] [US3] Write integration test for next card appearing after rating in tests/integration/study/rate-card.test.ts
+- [ ] T057 [P] [US3] Write E2E test for keyboard shortcuts (1/2/3/4) in tests/e2e/study-rating.spec.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation for User Story 3
+
+- [ ] T058 [US3] Create RatingButtons component with 4 buttons in components/study/RatingButtons.tsx
+- [ ] T059 [US3] Style rating buttons: Again (red), Hard (orange), Good (green), Easy (blue)
+- [ ] T060 [US3] Ensure rating buttons are 44px+ minimum on mobile
+- [ ] T061 [US3] Position rating buttons at bottom (thumb-reachable on mobile)
+- [ ] T062 [US3] Implement rateCard server action in app/actions/study.ts
+- [ ] T063 [US3] Integrate SM-2 algorithm in rateCard action
+- [ ] T064 [US3] Update card schedule in database (ease_factor, interval, repetitions, last_reviewed, next_review)
+- [ ] T065 [US3] Handle "Again" rating: interval=0, add back to session queue
+- [ ] T066 [US3] Get next card from queue after rating
+- [ ] T067 [US3] Implement optimistic UI update (show next card immediately)
+- [ ] T068 [US3] Add keyboard shortcuts: 1=Again, 2=Hard, 3=Good, 4=Easy
+- [ ] T069 [US3] Disable keyboard shortcuts while card is on front side
+- [ ] T070 [US3] Test rating updates schedule correctly for all 4 ratings
+- [ ] T071 [US3] Test "Again" card reappears later in session
+- [ ] T072 [US3] Test keyboard shortcuts work on desktop
+
+**Verify**: Run tests from T053-T057, all should PASS (green state)
+
+**Checkpoint**: Card rating works with SM-2 scheduling
+
+---
+
+## Phase 6: User Story 4 - Complete Study Session (Priority: P2)
+
+**Goal**: After all cards reviewed, show session summary with statistics
+
+**Independent Test**: Complete study session → see summary with stats → can return to deck
+
+### Tests for User Story 4 - Write FIRST, verify they FAIL
+
+- [ ] T073 [P] [US4] Write component test for SessionSummary in tests/unit/components/SessionSummary.test.tsx
+- [ ] T074 [P] [US4] Write integration test for session completion in tests/integration/study/complete-session.test.ts
+- [ ] T075 [P] [US4] Write test for session statistics calculation in tests/integration/study/session-stats.test.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation for User Story 4
+
+- [ ] T076 [US4] Create SessionSummary component in components/study/SessionSummary.tsx
+- [ ] T077 [US4] Track session statistics (cards studied, rating breakdown, duration)
+- [ ] T078 [US4] Show summary when all cards reviewed
+- [ ] T079 [US4] Display statistics: total cards, Again/Hard/Good/Easy counts, time elapsed
+- [ ] T080 [US4] Add "Return to Deck" button to navigate back
+- [ ] T081 [US4] Add congratulatory message based on performance
+- [ ] T082 [US4] Test session summary displays correct statistics
+
+**Verify**: Run tests from T073-T075, all should PASS (green state)
+
+**Checkpoint**: Study sessions complete with meaningful feedback
+
+---
+
+## Phase 7: User Story 5 - Progress Tracking During Session (Priority: P2)
+
+**Goal**: Users see progress indicator showing current position in session
+
+**Independent Test**: During study → progress shows "Card 5 of 20" → updates after each rating
+
+### Tests for User Story 5 - Write FIRST, verify they FAIL
+
+- [ ] T083 [P] [US5] Write component test for ProgressBar in tests/unit/components/ProgressBar.test.tsx
+- [ ] T084 [P] [US5] Write integration test for progress updating in tests/integration/study/progress.test.ts
+- [ ] T085 [P] [US5] Write test for progress count increasing with "Again" ratings in tests/integration/study/progress.test.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation for User Story 5
+
+- [ ] T086 [US5] Create ProgressBar component in components/study/ProgressBar.tsx
+- [ ] T087 [US5] Display "Card X of Y" at top of study page
+- [ ] T088 [US5] Update current card number after each rating
+- [ ] T089 [US5] Increment total count when "Again" card added to queue
+- [ ] T090 [US5] Style progress bar for mobile visibility
+- [ ] T091 [US5] Test progress indicator updates correctly
+- [ ] T092 [US5] Test total count increases with "Again" ratings
+
+**Verify**: Run tests from T083-T085, all should PASS (green state)
+
+**Checkpoint**: Users can track progress through session
+
+---
+
+## Phase 8: User Story 6 - Exit Study Session Early (Priority: P3)
+
+**Goal**: Users can exit session before completion, progress is saved
+
+**Independent Test**: Start session → review some cards → exit → progress saved → remaining cards still due
+
+### Tests for User Story 6 - Write FIRST, verify they FAIL
+
+- [ ] T093 [P] [US6] Write E2E test for exit confirmation in tests/e2e/study-exit.spec.ts
+- [ ] T094 [P] [US6] Write integration test for progress preservation on exit in tests/integration/study/exit-session.test.ts
+- [ ] T095 [P] [US6] Write test for unreviewed cards remaining due in tests/integration/study/exit-session.test.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation for User Story 6
+
+- [ ] T096 [US6] Add "Exit" button to study page
+- [ ] T097 [US6] Create exit confirmation dialog
+- [ ] T098 [US6] Save progress on exit (reviewed cards have updated schedules)
+- [ ] T099 [US6] Ensure unreviewed cards keep their due status
+- [ ] T100 [US6] Redirect to deck detail page on exit
+- [ ] T101 [US6] Test exit confirmation shows correctly
+- [ ] T102 [US6] Test reviewed cards don't reappear immediately
+
+**Verify**: Run tests from T093-T095, all should PASS (green state)
+
+**Checkpoint**: Users can exit sessions with progress preserved
+
+---
+
+## Phase 9: Mobile Optimizations & Gestures
+
+**Purpose**: Enhance mobile study experience
+
+### Tests - Write FIRST, verify they FAIL
+
+- [ ] T103 [P] Write E2E test for swipe to flip on mobile in tests/e2e/study-mobile.spec.ts
+- [ ] T104 [P] Write test for haptic feedback on rating in tests/e2e/study-mobile.spec.ts
+- [ ] T105 [P] Write test for scrollable card content in tests/e2e/study-mobile.spec.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation
+
+- [ ] T106 Implement swipe gesture to flip card (swipe up/down)
+- [ ] T107 Add haptic feedback on button press (mobile)
+- [ ] T108 Make card content area scrollable if exceeds viewport
+- [ ] T109 Keep rating buttons fixed at bottom during scroll
+- [ ] T110 Test swipe gesture on iOS Safari
+- [ ] T111 Test swipe gesture on Android Chrome
+- [ ] T112 Test long markdown content scrolls correctly
+- [ ] T113 Optimize touch response time (<100ms feedback)
+
+**Verify**: Run tests from T103-T105, all should PASS (green state)
+
+**Checkpoint**: Mobile study experience is optimized
+
+---
+
+## Phase 10: Accessibility
+
+**Purpose**: Ensure study mode is fully accessible
+
+### Tests - Write FIRST, verify they FAIL
+
+- [ ] T114 [P] Write test for keyboard navigation in tests/e2e/study-accessibility.spec.ts
+- [ ] T115 [P] Write test for screen reader announcements in tests/e2e/study-accessibility.spec.ts
+- [ ] T116 [P] Write test for focus management in tests/e2e/study-accessibility.spec.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation
+
+- [ ] T117 [P] Add ARIA labels to all buttons and card states
+- [ ] T118 [P] Add ARIA live region for progress updates
+- [ ] T119 [P] Add ARIA announcements for card flips
+- [ ] T120 Test with screen reader (VoiceOver or NVDA)
+- [ ] T121 Test keyboard-only navigation through entire study flow
+- [ ] T122 Verify focus order is logical
+- [ ] T123 Test with 200% browser zoom
+- [ ] T124 Run Lighthouse accessibility audit (target: 90+ score)
+
+**Verify**: Run tests from T114-T116, all should PASS (green state)
+
+**Checkpoint**: Study mode is fully accessible
+
+---
+
+## Phase 11: Edge Cases & Performance
+
+**Purpose**: Handle edge cases and optimize performance
+
+### Tests - Write FIRST, verify they FAIL
+
+- [ ] T125 [P] Write test for very long card content (10KB) in tests/integration/study/edge-cases.test.ts
+- [ ] T126 [P] Write test for rapid button clicks in tests/integration/study/edge-cases.test.ts
+- [ ] T127 [P] Write test for network errors during rating in tests/integration/study/edge-cases.test.ts
+- [ ] T128 [P] Write performance test for 50-card session in tests/performance/study.test.ts
+
+**Verify**: Run tests, confirm all FAIL (red state)
+
+### Implementation
+
+- [ ] T129 Handle very long markdown content gracefully
+- [ ] T130 Debounce rating button clicks (prevent double-submission)
+- [ ] T131 Handle network errors with retry mechanism
+- [ ] T132 Add error messages for failed rating submissions
+- [ ] T133 Preload next card while user is viewing current card
+- [ ] T134 Optimize markdown parsing (cache parsed content)
+- [ ] T135 Test study session with 50 cards completes smoothly
+- [ ] T136 Test on 3G connection (simulate slow network)
+- [ ] T137 Measure and optimize flip animation (60fps target)
+
+**Verify**: Run tests from T125-T128, all should PASS (green state)
+
+**Checkpoint**: Study mode handles edge cases and performs well
+
+---
+
+## Phase 12: Polish & Cross-Cutting Concerns
+
+**Purpose**: Final improvements
+
+- [ ] T138 [P] Add loading states for session initialization
+- [ ] T139 [P] Add transition animations between cards
+- [ ] T140 [P] Add visual feedback when card is added to queue ("Again" rating)
+- [ ] T141 Style code blocks in markdown with proper highlighting
+- [ ] T142 Make tables in markdown responsive (horizontal scroll on mobile)
+- [ ] T143 Add "Study Statistics" page showing overall progress
+- [ ] T144 Add session timer display
+- [ ] T145 Support LaTeX/math notation in markdown (optional enhancement)
+- [ ] T146 Test with various markdown edge cases (nested lists, complex tables)
+- [ ] T147 Add analytics events for study sessions
+- [ ] T148 Create study mode documentation
+- [ ] T149 Final E2E test for complete study flow (start → flip → rate → complete)
+- [ ] T150 Performance benchmarking and optimization report
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Setup (Phase 1)**: No dependencies - start immediately
+- **Foundational (Phase 2)**: Depends on Setup - BLOCKS all study features
+  - **SM-2 Algorithm**: CRITICAL - must be thoroughly tested before any study features
+  - **Markdown Rendering**: Required for displaying cards
+  - **Database**: Required for storing/retrieving cards
+- **User Stories (Phase 3-8)**: All depend on Foundational completion
+  - US1 (Start Session) is entry point
+  - US2 (Flip Card) depends on US1
+  - US3 (Rate Card) depends on US2 + SM-2 algorithm
+  - US4 (Complete Session) depends on US3
+  - US5 (Progress) depends on US1-US3
+  - US6 (Exit Early) depends on US1-US3
+- **Mobile (Phase 9)**: Can start after US2 (Flip) completes
+- **Accessibility (Phase 10)**: Can start after US1-US3 complete
+- **Edge Cases (Phase 11)**: Depends on US1-US3 completion
+- **Polish (Phase 12)**: Depends on all previous phases
+
+### Within Each User Story - TDD Flow
+
+1. **RED**: Write tests first (verify they FAIL)
+2. **GREEN**: Implement code to make tests PASS
+3. **REFACTOR**: Clean up code while tests still PASS
+4. Move to next story
+
+### Critical Path
+
+```
+Setup → Foundational (SM-2 + Markdown + DB) → 
+  US1 (Start) → US2 (Flip) → US3 (Rate) → 
+    [MVP COMPLETE - Can study flashcards!]
+  → US4 (Summary) → US5 (Progress) → US6 (Exit) →
+  → Mobile → Accessibility → Edge Cases → Polish
+```
+
+### Parallel Opportunities
+
+**Within Foundational Phase (Phase 2)**:
+```bash
+# Tests can be written in parallel:
+T005 (SM-2 tests) + T012 (DB tests) + T016 (markdown tests) + T017 (sanitize tests)
+
+# After tests pass, implementations can be built in parallel:
+T006-T008 (SM-2) + T019-T022 (Markdown)
+T014 (card queries) + T015 (study queries)
+```
+
+**Within User Story 2 (Flip)**:
+```bash
+# Components in parallel:
+T040 (MarkdownRenderer) can start first
+T042 (CardFront) + T043 (CardBack) after MarkdownRenderer
+```
+
+**Within User Story 3 (Rate)**:
+```bash
+# Can work in parallel:
+T058-T061 (UI components)
+T062-T066 (Server action with SM-2)
+```
+
+**Across User Stories** (with multiple developers):
+- Developer A: US1 → US2 → US3 (critical path)
+- Developer B: After US3, work on US4 + US5 + US6
+- Developer C: After US2, work on Mobile + Accessibility
+
+---
+
+## Implementation Strategy
+
+### MVP First (Basic Study Flow Only)
+
+1. Complete Phase 1: Setup
+2. Complete Phase 2: Foundational (especially SM-2!) ✅ Foundation ready
+3. Complete Phase 3: US1 (Start Session) ✅ Can start studying
+4. Complete Phase 4: US2 (Flip Card) ✅ Can see answers
+5. Complete Phase 5: US3 (Rate Card) ✅ Spaced repetition works!
+6. **STOP and VALIDATE**: Core study loop works with SM-2
+7. Deploy MVP - users can study flashcards with spaced repetition
+
+### Incremental Delivery
+
+1. Foundation (SM-2 + Markdown) → Test extensively
+2. Add Start Session (US1) → Test independently → Deploy
+3. Add Flip (US2) → Test independently → Deploy
+4. Add Rating (US3) → Test independently → Deploy (MVP!)
+5. Add Summary (US4) → Deploy
+6. Add Progress (US5) → Deploy
+7. Add Exit (US6) → Deploy
+8. Add Mobile optimizations → Deploy
+9. Add Accessibility → Deploy
+10. Each addition enhances experience without breaking previous work
+
+---
+
+## Notes
+
+- **TDD is CRITICAL for SM-2**: Algorithm must be proven correct before use
+- **SM-2 tests are comprehensive**: Cover all ratings and edge cases
+- **Red-Green-Refactor**: Verify tests fail → make them pass → clean up
+- **[P] tasks**: Different files, can run in parallel
+- **[Story] labels**: Track which user story each task belongs to
+- Each user story is independently testable
+- Markdown security is critical (sanitization must work)
+- Card flip animation must be smooth (60fps on mobile)
+- SM-2 algorithm is the heart of the feature - test thoroughly
+- Commit after each task or logical group
+- Run tests frequently during implementation
+- Target: High test coverage especially for SM-2 algorithm (100%)
