@@ -2,6 +2,7 @@
 // Material Design style consistent with auth pages
 'use client'
 
+import { memo } from 'react'
 import { DeckWithStats } from '@/types/deck'
 import DeckStats from './DeckStats'
 import { formatDate } from '@/lib/utils/date'
@@ -13,7 +14,7 @@ interface DeckCardProps {
   onClick?: (deck: DeckWithStats) => void
 }
 
-export default function DeckCard({ deck, onEdit, onDelete, onClick }: DeckCardProps) {
+function DeckCard({ deck, onEdit, onDelete, onClick }: DeckCardProps) {
   const handleCardClick = () => {
     if (onClick) {
       onClick(deck)
@@ -34,9 +35,20 @@ export default function DeckCard({ deck, onEdit, onDelete, onClick }: DeckCardPr
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onClick && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault()
+      onClick(deck)
+    }
+  }
+
   return (
     <div
       onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      role={onClick ? 'button' : 'article'}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={`${deck.name}, ${deck.card_count} card${deck.card_count !== 1 ? 's' : ''}`}
       style={{
         backgroundColor: '#fff',
         borderRadius: '8px',
@@ -158,3 +170,13 @@ export default function DeckCard({ deck, onEdit, onDelete, onClick }: DeckCardPr
     </div>
   )
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(DeckCard, (prevProps, nextProps) => {
+  return (
+    prevProps.deck.id === nextProps.deck.id &&
+    prevProps.deck.name === nextProps.deck.name &&
+    prevProps.deck.card_count === nextProps.deck.card_count &&
+    prevProps.deck.updated_at === nextProps.deck.updated_at
+  )
+})

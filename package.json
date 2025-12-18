@@ -14,7 +14,8 @@
     "migrate:sh": "./scripts/migrate.sh",
     "test:db": "node scripts/test-connection.js",
     "test:auth": "node scripts/test-auth.js",
-    "test:decks": "node scripts/test-deck-flow.js"
+    "test:decks": "node scripts/test-deck-flow.js",
+    "test:nav": "node scripts/test-navigation.js"
   },
   "dependencies": {
     "@types/pg": "^8.16.0",

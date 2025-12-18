@@ -2,7 +2,7 @@
 // Consistent with auth pages styling
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface ModalProps {
   isOpen: boolean
@@ -19,6 +19,9 @@ export default function Modal({
   children,
   maxWidth = '500px',
 }: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null)
+  const previousActiveElement = useRef<HTMLElement | null>(null)
+
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -41,6 +44,61 @@ export default function Modal({
     return () => {
       document.body.style.overflow = 'unset'
     }
+  }, [isOpen])
+
+  // Focus management
+  useEffect(() => {
+    if (isOpen) {
+      // Save the currently focused element
+      previousActiveElement.current = document.activeElement as HTMLElement
+
+      // Focus the first focusable element in the modal
+      const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusableElements && focusableElements.length > 0) {
+        focusableElements[0].focus()
+      }
+    } else {
+      // Restore focus to the previously focused element
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus()
+      }
+    }
+  }, [isOpen])
+
+  // Trap focus within modal
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return
+
+      const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusableElements || focusableElements.length === 0) return
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault()
+          lastElement.focus()
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault()
+          firstElement.focus()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleTab)
+    return () => document.removeEventListener('keydown', handleTab)
   }, [isOpen])
 
   if (!isOpen) return null
@@ -69,10 +127,12 @@ export default function Modal({
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           animation: 'fadeIn 0.2s',
         }}
+        aria-hidden="true"
       />
 
       {/* Modal content */}
       <div
+        ref={modalRef}
         onClick={(e) => e.stopPropagation()}
         style={{
           position: 'relative',

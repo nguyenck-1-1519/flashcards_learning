@@ -199,15 +199,15 @@
 
 ### Implementation for User Story 5
 
-- [ ] T076 [US5] Create deck detail page at app/decks/[deckId]/page.tsx
-- [ ] T077 [US5] Add click handler to DeckCard for navigation (exclude edit/delete buttons)
-- [ ] T078 [US5] Use event.stopPropagation on edit/delete buttons
-- [ ] T079 [US5] Add breadcrumb navigation component for back to dashboard
-- [ ] T080 [US5] Display deck name in header on deck detail page
-- [ ] T081 [US5] Show "No cards in this deck. Add your first card!" empty state
-- [ ] T082 [US5] Test clicking deck navigates correctly
-- [ ] T083 [US5] Test clicking edit/delete does NOT navigate
-- [ ] T084 [US5] Test back button returns to dashboard
+- [X] T076 [US5] Create deck detail page at app/decks/[deckId]/page.tsx
+- [X] T077 [US5] Add click handler to DeckCard for navigation (exclude edit/delete buttons)
+- [X] T078 [US5] Use event.stopPropagation on edit/delete buttons
+- [X] T079 [US5] Add breadcrumb navigation component for back to dashboard
+- [X] T080 [US5] Display deck name in header on deck detail page
+- [X] T081 [US5] Show "No cards in this deck. Add your first card!" empty state
+- [X] T082 [US5] Test clicking deck navigates correctly
+- [X] T083 [US5] Test clicking edit/delete does NOT navigate
+- [X] T084 [US5] Test back button returns to dashboard
 
 **Verify**: Run tests from T073-T075, all should PASS (green state)
 
@@ -258,14 +258,14 @@
 
 ### Implementation
 
-- [ ] T099 [P] Add ARIA labels to all deck cards and buttons
-- [ ] T100 [P] Implement keyboard navigation for all modals (Tab, Enter, ESC)
-- [ ] T101 [P] Add focus management (focus first input in modals)
+- [X] T099 [P] Add ARIA labels to all deck cards and buttons
+- [X] T100 [P] Implement keyboard navigation for all modals (Tab, Enter, ESC)
+- [X] T101 [P] Add focus management (focus first input in modals)
 - [ ] T102 Test with screen reader (VoiceOver or NVDA)
 - [ ] T103 Test keyboard-only navigation through entire CRUD flow
 - [ ] T104 Verify focus order is logical
 - [ ] T105 Implement pagination or infinite scroll for 100+ decks
-- [ ] T106 Add React.memo to DeckCard to prevent unnecessary re-renders
+- [X] T106 Add React.memo to DeckCard to prevent unnecessary re-renders
 - [ ] T107 Optimize card count query (ensure it uses index)
 - [ ] T108 Run Lighthouse accessibility audit (target: 90+ score)
 - [ ] T109 Run Lighthouse performance audit (target: 90+ score)
@@ -281,7 +281,7 @@
 **Purpose**: Final improvements and edge cases
 
 - [ ] T110 [P] Add loading states for all async operations (create, update, delete)
-- [ ] T111 [P] Add success notifications (toast/snackbar) for CRUD operations
+- [X] T111 [P] Add success notifications (toast/snackbar) for CRUD operations
 - [ ] T112 [P] Add error recovery for network failures
 - [ ] T113 Add deck sorting options (by name, by date created, by card count)
 - [ ] T114 Add search/filter functionality for decks

@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { User } from '@/types/auth'
 import { DeckWithStats } from '@/types/deck'
 import LogoutButton from '@/components/auth/LogoutButton'
@@ -22,12 +23,18 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({ user, initialDecks }: DashboardClientProps) {
+  const router = useRouter()
   const [decks, setDecks] = useState(initialDecks)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedDeck, setSelectedDeck] = useState<DeckWithStats | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  // Navigate to deck detail
+  const handleDeckClick = (deck: DeckWithStats) => {
+    router.push(`/decks/${deck.id}`)
+  }
 
   // Create deck handler
   const handleCreateDeck = async (name: string) => {
@@ -190,6 +197,7 @@ export default function DashboardClient({ user, initialDecks }: DashboardClientP
             decks={decks}
             onEdit={openEditModal}
             onDelete={openDeleteDialog}
+            onClick={handleDeckClick}
           />
         )}
       </div>
