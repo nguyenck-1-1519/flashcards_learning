@@ -1,7 +1,7 @@
 // Database query functions for deck operations
-// Uses @vercel/postgres for PostgreSQL connections
+// Uses pg library for PostgreSQL connections
 
-import { sql } from '@vercel/postgres'
+import { getPool } from '../connection'
 import { Deck, DeckWithStats } from '@/types/deck'
 
 /**
@@ -10,11 +10,13 @@ import { Deck, DeckWithStats } from '@/types/deck'
  * @returns Promise resolving to array of decks with card counts
  */
 export async function getAllDecks(userId: string): Promise<DeckWithStats[]> {
+  const pool = getPool()
+  
   try {
     // Note: cards table doesn't exist yet, so card_count will be 0
     // This query will be updated when cards table is created
-    const result = await sql<DeckWithStats>`
-      SELECT 
+    const result = await pool.query<DeckWithStats>(
+      `SELECT 
         d.id,
         d.name,
         d.user_id,
@@ -23,22 +25,24 @@ export async function getAllDecks(userId: string): Promise<DeckWithStats[]> {
         COALESCE(COUNT(c.id), 0)::int as card_count
       FROM decks d
       LEFT JOIN cards c ON c.deck_id = d.id
-      WHERE d.user_id = ${userId}
+      WHERE d.user_id = $1
       GROUP BY d.id, d.name, d.user_id, d.created_at, d.updated_at
-      ORDER BY d.updated_at DESC, d.created_at DESC
-    `
+      ORDER BY d.updated_at DESC, d.created_at DESC`,
+      [userId]
+    )
 
     return result.rows
   } catch (error) {
     console.error('Get all decks error:', error)
     // If cards table doesn't exist yet, fallback to simple query
     try {
-      const result = await sql<Deck>`
-        SELECT id, name, user_id, created_at, updated_at
+      const result = await pool.query<Deck>(
+        `SELECT id, name, user_id, created_at, updated_at
         FROM decks
-        WHERE user_id = ${userId}
-        ORDER BY updated_at DESC, created_at DESC
-      `
+        WHERE user_id = $1
+        ORDER BY updated_at DESC, created_at DESC`,
+        [userId]
+      )
       
       return result.rows.map(deck => ({
         ...deck,
@@ -61,13 +65,13 @@ export async function getDeckById(
   deckId: string,
   userId: string
 ): Promise<Deck | null> {
+  const pool = getPool()
+  
   try {
-    const result = await sql<Deck>`
-      SELECT id, name, user_id, created_at, updated_at
-      FROM decks
-      WHERE id = ${deckId} AND user_id = ${userId}
-      LIMIT 1
-    `
+    const result = await pool.query<Deck>(
+      'SELECT id, name, user_id, created_at, updated_at FROM decks WHERE id = $1 AND user_id = $2 LIMIT 1',
+      [deckId, userId]
+    )
 
     if (result.rows.length === 0) {
       return null
@@ -90,12 +94,13 @@ export async function createDeck(
   name: string,
   userId: string
 ): Promise<Deck> {
+  const pool = getPool()
+  
   try {
-    const result = await sql<Deck>`
-      INSERT INTO decks (name, user_id)
-      VALUES (${name.trim()}, ${userId})
-      RETURNING id, name, user_id, created_at, updated_at
-    `
+    const result = await pool.query<Deck>(
+      'INSERT INTO decks (name, user_id) VALUES ($1, $2) RETURNING id, name, user_id, created_at, updated_at',
+      [name.trim(), userId]
+    )
 
     if (result.rows.length === 0) {
       throw new Error('Failed to create deck')
@@ -120,13 +125,13 @@ export async function updateDeck(
   name: string,
   userId: string
 ): Promise<Deck> {
+  const pool = getPool()
+  
   try {
-    const result = await sql<Deck>`
-      UPDATE decks
-      SET name = ${name.trim()}
-      WHERE id = ${deckId} AND user_id = ${userId}
-      RETURNING id, name, user_id, created_at, updated_at
-    `
+    const result = await pool.query<Deck>(
+      'UPDATE decks SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING id, name, user_id, created_at, updated_at',
+      [name.trim(), deckId, userId]
+    )
 
     if (result.rows.length === 0) {
       throw new Error('Deck not found or unauthorized')
@@ -149,12 +154,13 @@ export async function deleteDeck(
   deckId: string,
   userId: string
 ): Promise<void> {
+  const pool = getPool()
+  
   try {
-    const result = await sql`
-      DELETE FROM decks
-      WHERE id = ${deckId} AND user_id = ${userId}
-      RETURNING id
-    `
+    const result = await pool.query(
+      'DELETE FROM decks WHERE id = $1 AND user_id = $2 RETURNING id',
+      [deckId, userId]
+    )
 
     if (result.rows.length === 0) {
       throw new Error('Deck not found or unauthorized')
@@ -171,14 +177,15 @@ export async function deleteDeck(
  * @returns Promise resolving to deck count
  */
 export async function getDeckCount(userId: string): Promise<number> {
+  const pool = getPool()
+  
   try {
-    const result = await sql<{ count: number }>`
-      SELECT COUNT(*)::int as count
-      FROM decks
-      WHERE user_id = ${userId}
-    `
+    const result = await pool.query<{ count: string }>(
+      'SELECT COUNT(*) as count FROM decks WHERE user_id = $1',
+      [userId]
+    )
 
-    return result.rows[0]?.count || 0
+    return parseInt(result.rows[0]?.count || '0', 10)
   } catch (error) {
     console.error('Get deck count error:', error)
     return 0

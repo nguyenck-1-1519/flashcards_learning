@@ -1,7 +1,7 @@
 // Database query functions for user operations
-// Uses @vercel/postgres for PostgreSQL connections
+// Uses pg library for PostgreSQL connections
 
-import { sql } from '@vercel/postgres'
+import { getPool } from './connection'
 import { User, UserWithPassword } from '@/types/auth'
 
 /**
@@ -15,12 +15,13 @@ export async function createUser(
   email: string,
   passwordHash: string
 ): Promise<User> {
+  const pool = getPool()
+  
   try {
-    const result = await sql<User>`
-      INSERT INTO users (email, password_hash)
-      VALUES (${email}, ${passwordHash})
-      RETURNING id, email, created_at, last_login
-    `
+    const result = await pool.query<User>(
+      'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, created_at, last_login',
+      [email, passwordHash]
+    )
     
     if (result.rows.length === 0) {
       throw new Error('Failed to create user')
@@ -45,13 +46,13 @@ export async function createUser(
 export async function findUserByEmail(
   email: string
 ): Promise<UserWithPassword | null> {
+  const pool = getPool()
+  
   try {
-    const result = await sql<UserWithPassword>`
-      SELECT id, email, password_hash, created_at, last_login
-      FROM users
-      WHERE email = ${email}
-      LIMIT 1
-    `
+    const result = await pool.query<UserWithPassword>(
+      'SELECT id, email, password_hash, created_at, last_login FROM users WHERE email = $1 LIMIT 1',
+      [email]
+    )
 
     if (result.rows.length === 0) {
       return null
@@ -70,12 +71,13 @@ export async function findUserByEmail(
  * @returns Promise resolving to void
  */
 export async function updateLastLogin(userId: string): Promise<void> {
+  const pool = getPool()
+  
   try {
-    await sql`
-      UPDATE users
-      SET last_login = CURRENT_TIMESTAMP
-      WHERE id = ${userId}
-    `
+    await pool.query(
+      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+      [userId]
+    )
   } catch (error) {
     console.error('Update last login error:', error)
     // Don't throw - non-critical operation
@@ -88,13 +90,13 @@ export async function updateLastLogin(userId: string): Promise<void> {
  * @returns Promise resolving to User or null
  */
 export async function getUserById(userId: string): Promise<User | null> {
+  const pool = getPool()
+  
   try {
-    const result = await sql<User>`
-      SELECT id, email, created_at, last_login
-      FROM users
-      WHERE id = ${userId}
-      LIMIT 1
-    `
+    const result = await pool.query<User>(
+      'SELECT id, email, created_at, last_login FROM users WHERE id = $1 LIMIT 1',
+      [userId]
+    )
 
     if (result.rows.length === 0) {
       return null
