@@ -56,12 +56,14 @@ export default function DashboardClient({ user, initialDecks }: DashboardClientP
       throw new Error(result.error?.message || 'Failed to update deck')
     }
 
-    // Optimistic update
-    setDecks((prev) =>
-      prev.map((deck) =>
-        deck.id === deckId ? { ...deck, name, updated_at: new Date() } : deck
+    // Optimistic update - use result from server or current timestamp as string
+    if (result.deck) {
+      setDecks((prev) =>
+        prev.map((deck) =>
+          deck.id === deckId ? { ...result.deck!, card_count: deck.card_count } : deck
+        )
       )
-    )
+    }
 
     // Force refresh from server
     startTransition(() => {

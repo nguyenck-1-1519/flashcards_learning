@@ -4,6 +4,7 @@
 
 import { DeckWithStats } from '@/types/deck'
 import DeckStats from './DeckStats'
+import { formatDate } from '@/lib/utils/date'
 
 interface DeckCardProps {
   deck: DeckWithStats
@@ -152,7 +153,7 @@ export default function DeckCard({ deck, onEdit, onDelete, onClick }: DeckCardPr
 
       {/* Created date (small text) */}
       <div style={{ fontSize: '0.75rem', color: '#999', marginTop: 'auto' }}>
-        Created {new Date(deck.created_at).toLocaleDateString()}
+        Created {formatDate(deck.created_at)}
       </div>
     </div>
   )

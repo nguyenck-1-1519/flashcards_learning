@@ -3,8 +3,8 @@
 export interface User {
   id: string
   email: string
-  created_at: Date
-  last_login?: Date
+  created_at: Date | string // Can be Date object or ISO string from DB
+  last_login?: Date | string | null // Can be Date object or ISO string from DB
 }
 
 export interface UserWithPassword extends User {
