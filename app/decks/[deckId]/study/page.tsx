@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { getSession } from '@/lib/auth/session'
 import { getDeckById } from '@/lib/db/queries/decks'
-import { getDueCards } from '@/lib/db/queries/study'
+import { getAllCards } from '@/lib/db/queries/cards'
 import StudySessionClient from '@/components/study/StudySessionClient'
 
 interface StudyPageProps {
@@ -22,19 +22,14 @@ export default async function StudyPage({ params }: StudyPageProps) {
     redirect('/login')
   }
 
-  // Get deck
-  const deck = await getDeckById(params.deckId)
+  // Get deck (with user authorization check built-in)
+  const deck = await getDeckById(params.deckId, session.userId)
   if (!deck) {
     redirect('/dashboard')
   }
 
-  // Check authorization
-  if (deck.user_id !== session.userId) {
-    redirect('/dashboard')
-  }
+  // Get all cards from deck (will be randomly selected in StudySessionClient)
+  const allCards = await getAllCards(params.deckId)
 
-  // Get due cards
-  const dueCards = await getDueCards(params.deckId)
-
-  return <StudySessionClient deck={deck} initialCards={dueCards} />
+  return <StudySessionClient deck={deck} initialCards={allCards} />
 }

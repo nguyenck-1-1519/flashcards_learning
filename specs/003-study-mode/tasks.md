@@ -207,15 +207,16 @@
 
 ## Phase 3: User Story 1 - Start Study Session (Priority: P1) 🎯 MVP
 
-**Goal**: Users can start study session with due cards
+**Goal**: Users can start study session with randomly selected maximum 10 cards
 
-**Independent Test**: Open deck with cards → click "Study" → first card's front side displays
+**Independent Test**: Open deck with cards → click "Study" → session starts with up to 10 randomly selected cards
 
 ### Tests for User Story 1 - Write FIRST, verify they FAIL
 
 - [ ] T023 [P] [US1] Write integration test for starting study session in tests/integration/study/start-session.test.ts
-- [ ] T024 [P] [US1] Write test for due cards query ordering (new cards first, then by date) in tests/integration/study/card-queue.test.ts
-- [ ] T025 [P] [US1] Write test for empty study state (no cards due) in tests/integration/study/empty-state.test.ts
+- [ ] T023a [P] [US1] Write test for random card selection (max 10 cards) in tests/integration/study/card-selection.test.ts
+- [ ] T024 [P] [US1] Write test for session with fewer than 10 cards (all cards included) in tests/integration/study/card-queue.test.ts
+- [ ] T025 [P] [US1] Write test for empty study state (no cards) in tests/integration/study/empty-state.test.ts
 - [ ] T026 [P] [US1] Write component test for EmptyStudyState in tests/unit/components/EmptyStudyState.test.tsx
 
 **Verify**: Run tests, confirm all FAIL (red state)
@@ -224,13 +225,14 @@
 
 - [X] T027 [US1] Create EmptyStudyState component in components/study/EmptyStudyState.tsx
 - [X] T028 [US1] Create study page at app/decks/[deckId]/study/page.tsx
-- [X] T029 [US1] Implement session initialization (fetch due cards from database)
-- [X] T030 [US1] Create card queue logic in lib/study/queue.ts (new cards first, then by next_review)
+- [X] T029 [US1] Update session initialization to randomly select maximum 10 cards
+- [X] T029a [US1] Implement random card selection logic in lib/study/queue.ts
+- [X] T029b [US1] Handle case where deck has ≤10 cards (include all)
+- [X] T029c [US1] Handle case where deck has >10 cards (randomly select 10)
 - [X] T031 [US1] Add "Study" button to deck detail page
-- [X] T032 [US1] Handle case when no cards are due (show EmptyStudyState)
-- [X] T033 [US1] Add "Study All Cards Anyway" option
-- [X] T034 [US1] Display first card's front side
-- [X] T035 [US1] Test session starts with correct card order
+- [ ] T032 [US1] Handle case when deck has no cards (show EmptyStudyState with "Add Card" button)
+- [X] T034 [US1] Display first card's front side (not flipped)
+- [ ] T035 [US1] Test session starts with correct random selection (max 10 cards)
 
 **Verify**: Run tests from T023-T026, all should PASS (green state)
 
@@ -240,16 +242,17 @@
 
 ## Phase 4: User Story 2 - Flip Card to See Answer (Priority: P1) 🎯 MVP
 
-**Goal**: Users can flip cards to reveal answers with smooth animation
+**Goal**: Users can click on card to flip and reveal answer with rating buttons
 
-**Independent Test**: See card front → click/tap/spacebar → card flips → see back with markdown
+**Independent Test**: See card front → click anywhere on card → card flips → see back with markdown and rating buttons
 
 ### Tests for User Story 2 - Write FIRST, verify they FAIL
 
 - [ ] T036 [P] [US2] Write component test for StudyCard flip animation in tests/unit/components/StudyCard.test.tsx
+- [ ] T036a [P] [US2] Write test for click-to-flip (click anywhere on card) in tests/unit/components/StudyCard.test.tsx
 - [ ] T037 [P] [US2] Write component test for CardFront rendering markdown in tests/unit/components/CardFront.test.tsx
 - [ ] T038 [P] [US2] Write component test for CardBack rendering markdown in tests/unit/components/CardBack.test.tsx
-- [ ] T039 [P] [US2] Write E2E test for flip interactions (button, tap, spacebar) in tests/e2e/study-flip.spec.ts
+- [ ] T039 [P] [US2] Write E2E test for flip interactions (click card) in tests/e2e/study-flip.spec.ts
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
@@ -259,15 +262,14 @@
 - [X] T041 [US2] Add CSS for markdown content (responsive, mobile-friendly)
 - [X] T042 [US2] Create CardFront component with MarkdownRenderer in components/study/CardFront.tsx
 - [X] T043 [US2] Create CardBack component with MarkdownRenderer in components/study/CardBack.tsx
-- [X] T044 [US2] Create StudyCard component with flip state in components/study/StudyCard.tsx
+- [X] T044 [US2] Update StudyCard component to handle click-to-flip (click anywhere on card)
+- [X] T044a [US2] Remove separate Flip button (flip happens on card click)
 - [X] T045 [US2] Implement 3D flip animation (180deg Y-axis rotation, 300ms)
 - [X] T046 [US2] Use CSS transform3d for hardware acceleration
-- [X] T047 [US2] Add flip triggers: button click, card tap (mobile), spacebar key
-- [X] T048 [US2] Disable interactions during flip animation
-- [X] T049 [US2] Test flip animation on iOS Safari (target: 60fps)
-- [X] T050 [US2] Test flip animation on Android Chrome (target: 60fps)
-- [X] T051 [US2] Test markdown renders correctly on both sides
-- [X] T052 [US2] Test code blocks have syntax highlighting
+- [X] T048 [US2] Add animation lock to prevent clicks during flip animation
+- [X] T048a [US2] Show rating buttons only after flip animation completes
+- [ ] T051 [US2] Test markdown renders correctly on both sides
+- [ ] T052 [US2] Test code blocks have syntax highlighting
 
 **Verify**: Run tests from T036-T039, all should PASS (green state)
 
@@ -275,39 +277,47 @@
 
 ---
 
-## Phase 5: User Story 3 - Rate Card Difficulty (Priority: P1) 🎯 MVP
+## Phase 5: User Story 3 - Rate Card and Navigate (Priority: P1) 🎯 MVP
 
-**Goal**: Users rate cards, SM-2 updates schedule, next card appears
+**Goal**: Users select rating, then click Next to advance to next card (or Complete on last card)
 
-**Independent Test**: Flip card → click rating button → card schedule updates → next card shows
+**Independent Test**: Flip card → select rating → Next button enables → click Next → SM-2 updates → next card shows
 
 ### Tests for User Story 3 - Write FIRST, verify they FAIL
 
 - [ ] T053 [P] [US3] Write component test for RatingButtons rendering in tests/unit/components/RatingButtons.test.tsx
-- [ ] T054 [P] [US3] Write integration test for rating updating card schedule in tests/integration/study/rate-card.test.ts
-- [ ] T055 [P] [US3] Write integration test for "Again" card re-queuing in tests/integration/study/rate-card.test.ts
-- [ ] T056 [P] [US3] Write integration test for next card appearing after rating in tests/integration/study/rate-card.test.ts
-- [ ] T057 [P] [US3] Write E2E test for keyboard shortcuts (1/2/3/4) in tests/e2e/study-rating.spec.ts
+- [ ] T053a [P] [US3] Write test for rating selection (highlight selected rating) in tests/unit/components/RatingButtons.test.tsx
+- [ ] T053b [P] [US3] Write test for Next button state (disabled until rating selected) in tests/unit/components/StudySessionClient.test.tsx
+- [ ] T054 [P] [US3] Write integration test for Next button updating card schedule in tests/integration/study/rate-card.test.ts
+- [ ] T055 [P] [US3] Write test for Complete button on last card in tests/integration/study/rate-card.test.ts
+- [ ] T056 [P] [US3] Write integration test for next card appearing after Next click in tests/integration/study/rate-card.test.ts
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
 ### Implementation for User Story 3
 
-- [X] T058 [US3] Create RatingButtons component with 4 buttons in components/study/RatingButtons.tsx
+- [X] T058 [US3] Update RatingButtons component to handle selection (not immediate advance)
+- [X] T058a [US3] Add visual feedback for selected rating (highlight/border)
+- [X] T058b [US3] Emit onRatingSelect event instead of immediate action
 - [X] T059 [US3] Style rating buttons: Again (red), Hard (orange), Good (green), Easy (blue)
 - [X] T060 [US3] Ensure rating buttons are 44px+ minimum on mobile
 - [X] T061 [US3] Position rating buttons at bottom (thumb-reachable on mobile)
-- [X] T062 [US3] Implement rateCard server action in app/actions/study.ts
-- [X] T063 [US3] Integrate SM-2 algorithm in rateCard action
+- [X] T061a [US3] Add Next button below rating buttons (disabled by default)
+- [X] T061b [US3] Add Complete button for last card (instead of Next)
+- [X] T061c [US3] Enable Next/Complete button only after rating is selected
+- [X] T061d [US3] Style disabled state clearly (grayed out, opacity 0.5)
+- [X] T062 [US3] Update StudySessionClient to track selectedRating state
+- [X] T062a [US3] Handle rating selection (update state, enable Next button)
+- [X] T062b [US3] Handle Next button click (apply SM-2, save to DB, advance to next card)
+- [X] T062c [US3] Handle Complete button click (apply SM-2, save to DB, show summary)
+- [X] T063 [US3] Integrate SM-2 algorithm when Next/Complete is clicked
 - [X] T064 [US3] Update card schedule in database (ease_factor, interval, repetitions, last_reviewed, next_review)
-- [X] T065 [US3] Handle "Again" rating: interval=0, add back to session queue
-- [X] T066 [US3] Get next card from queue after rating
-- [X] T067 [US3] Implement optimistic UI update (show next card immediately)
-- [X] T068 [US3] Add keyboard shortcuts: 1=Again, 2=Hard, 3=Good, 4=Easy
-- [X] T069 [US3] Disable keyboard shortcuts while card is on front side
-- [X] T070 [US3] Test rating updates schedule correctly for all 4 ratings
-- [X] T071 [US3] Test "Again" card reappears later in session
-- [X] T072 [US3] Test keyboard shortcuts work on desktop
+- [X] T066 [US3] Advance to next card's front side (not flipped) after Next click
+- [X] T066a [US3] Reset card flip state when advancing to next card
+- [X] T066b [US3] Reset selectedRating state when advancing
+- [ ] T070 [US3] Test rating updates schedule correctly for all 4 ratings
+- [ ] T071 [US3] Test Next button disabled until rating selected
+- [ ] T072 [US3] Test Complete button appears on last card
 
 **Verify**: Run tests from T053-T057, all should PASS (green state)
 
@@ -317,27 +327,27 @@
 
 ## Phase 6: User Story 4 - Complete Study Session (Priority: P2)
 
-**Goal**: After all cards reviewed, show session summary with statistics
+**Goal**: After rating last card and clicking Complete, show session summary with statistics
 
-**Independent Test**: Complete study session → see summary with stats → can return to deck
+**Independent Test**: Rate last card → click Complete → all cards saved with SM-2 schedules → summary shows with stats
 
 ### Tests for User Story 4 - Write FIRST, verify they FAIL
 
 - [ ] T073 [P] [US4] Write component test for SessionSummary in tests/unit/components/SessionSummary.test.tsx
-- [ ] T074 [P] [US4] Write integration test for session completion in tests/integration/study/complete-session.test.ts
-- [ ] T075 [P] [US4] Write test for session statistics calculation in tests/integration/study/session-stats.test.ts
+- [ ] T074 [P] [US4] Write integration test for Complete button triggering summary in tests/integration/study/complete-session.test.ts
+- [ ] T075 [P] [US4] Write test for session statistics calculation (max 10 cards) in tests/integration/study/session-stats.test.ts
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
 ### Implementation for User Story 4
 
 - [X] T076 [US4] Create SessionSummary component in components/study/SessionSummary.tsx
-- [X] T077 [US4] Track session statistics (cards studied, rating breakdown, duration)
-- [X] T078 [US4] Show summary when all cards reviewed
-- [X] T079 [US4] Display statistics: total cards, Again/Hard/Good/Easy counts, time elapsed
-- [X] T080 [US4] Add "Return to Deck" button to navigate back
+- [X] T077 [US4] Track session statistics (cards studied max 10, rating breakdown, duration)
+- [X] T078 [US4] Show summary when Complete button clicked on last card
+- [X] T079 [US4] Display statistics: total cards (max 10), Again/Hard/Good/Easy counts, time elapsed
+- [X] T080 [US4] Add "Return to Deck" button to navigate back to deck detail
 - [X] T081 [US4] Add congratulatory message based on performance
-- [X] T082 [US4] Test session summary displays correct statistics
+- [ ] T082 [US4] Test session summary displays correct statistics for sessions with <10 cards
 
 **Verify**: Run tests from T073-T075, all should PASS (green state)
 
@@ -347,27 +357,26 @@
 
 ## Phase 7: User Story 5 - Progress Tracking During Session (Priority: P2)
 
-**Goal**: Users see progress indicator showing current position in session
+**Goal**: Users see progress indicator showing current position in session (max 10 cards)
 
-**Independent Test**: During study → progress shows "Card 5 of 20" → updates after each rating
+**Independent Test**: During study → progress shows "Card 5 of 10" → updates after clicking Next
 
 ### Tests for User Story 5 - Write FIRST, verify they FAIL
 
 - [ ] T083 [P] [US5] Write component test for ProgressBar in tests/unit/components/ProgressBar.test.tsx
-- [ ] T084 [P] [US5] Write integration test for progress updating in tests/integration/study/progress.test.ts
-- [ ] T085 [P] [US5] Write test for progress count increasing with "Again" ratings in tests/integration/study/progress.test.ts
+- [ ] T084 [P] [US5] Write integration test for progress updating after Next click in tests/integration/study/progress.test.ts
+- [ ] T085 [P] [US5] Write test for progress with sessions <10 cards in tests/integration/study/progress.test.ts
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
 ### Implementation for User Story 5
 
 - [X] T086 [US5] Create ProgressBar component in components/study/ProgressBar.tsx
-- [X] T087 [US5] Display "Card X of Y" at top of study page
-- [X] T088 [US5] Update current card number after each rating
-- [X] T089 [US5] Increment total count when "Again" card added to queue
-- [X] T090 [US5] Style progress bar for mobile visibility
-- [X] T091 [US5] Test progress indicator updates correctly
-- [X] T092 [US5] Test total count increases with "Again" ratings
+- [X] T087 [US5] Display "Card X of Y" at top of study page (Y is max 10 or total if less)
+- [X] T088 [US5] Update current card number after Next button click
+- [ ] T090 [US5] Style progress bar for mobile visibility
+- [ ] T091 [US5] Test progress indicator updates correctly (e.g., "Card 3 of 7" for 7-card session)
+- [ ] T092 [US5] Test progress shows accurate total (not exceeding actual card count)
 
 **Verify**: Run tests from T083-T085, all should PASS (green state)
 
@@ -377,27 +386,27 @@
 
 ## Phase 8: User Story 6 - Exit Study Session Early (Priority: P3)
 
-**Goal**: Users can exit session before completion, progress is saved
+**Goal**: Users can exit session before completion, rated cards are saved
 
-**Independent Test**: Start session → review some cards → exit → progress saved → remaining cards still due
+**Independent Test**: Start session → rate some cards → click Exit → rated cards saved → return to deck detail
 
 ### Tests for User Story 6 - Write FIRST, verify they FAIL
 
 - [ ] T093 [P] [US6] Write E2E test for exit confirmation in tests/e2e/study-exit.spec.ts
-- [ ] T094 [P] [US6] Write integration test for progress preservation on exit in tests/integration/study/exit-session.test.ts
-- [ ] T095 [P] [US6] Write test for unreviewed cards remaining due in tests/integration/study/exit-session.test.ts
+- [ ] T094 [P] [US6] Write integration test for progress preservation on exit (only rated cards saved) in tests/integration/study/exit-session.test.ts
+- [ ] T095 [P] [US6] Write test for autosave on page unload in tests/integration/study/exit-session.test.ts
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
 ### Implementation for User Story 6
 
-- [X] T096 [US6] Add "Exit" button to study page
-- [X] T097 [US6] Create exit confirmation dialog
-- [X] T098 [US6] Save progress on exit (reviewed cards have updated schedules)
-- [X] T099 [US6] Ensure unreviewed cards keep their due status
+- [X] T096 [US6] Add "Exit" button to study page header
+- [X] T097 [US6] Create exit confirmation dialog ("Exit study? Your progress will be saved.")
+- [X] T098 [US6] Save progress on exit (only cards that were rated with Next/Complete)
+- [ ] T099 [US6] Implement autosave on page unload (beforeunload event)
 - [X] T100 [US6] Redirect to deck detail page on exit
-- [X] T101 [US6] Test exit confirmation shows correctly
-- [X] T102 [US6] Test reviewed cards don't reappear immediately
+- [ ] T101 [US6] Test exit confirmation shows correctly
+- [ ] T102 [US6] Test only rated cards are saved (current unrated card not saved)
 
 **Verify**: Run tests from T093-T095, all should PASS (green state)
 

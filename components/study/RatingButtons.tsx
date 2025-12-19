@@ -6,11 +6,16 @@ import { useEffect } from 'react'
 import { Rating } from '@/types/study'
 
 interface RatingButtonsProps {
-  onRate: (rating: Rating) => void
+  onRatingSelect: (rating: Rating) => void
+  selectedRating: Rating | null
   disabled?: boolean
 }
 
-export default function RatingButtons({ onRate, disabled = false }: RatingButtonsProps) {
+export default function RatingButtons({ 
+  onRatingSelect, 
+  selectedRating,
+  disabled = false 
+}: RatingButtonsProps) {
   // Keyboard shortcuts: 1=Again, 2=Hard, 3=Good, 4=Easy
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -18,23 +23,23 @@ export default function RatingButtons({ onRate, disabled = false }: RatingButton
 
       switch (e.key) {
         case '1':
-          onRate(Rating.Again)
+          onRatingSelect(Rating.Again)
           break
         case '2':
-          onRate(Rating.Hard)
+          onRatingSelect(Rating.Hard)
           break
         case '3':
-          onRate(Rating.Good)
+          onRatingSelect(Rating.Good)
           break
         case '4':
-          onRate(Rating.Easy)
+          onRatingSelect(Rating.Easy)
           break
       }
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [onRate, disabled])
+  }, [onRatingSelect, disabled])
 
   const buttons = [
     {
@@ -78,56 +83,66 @@ export default function RatingButtons({ onRate, disabled = false }: RatingButton
         padding: '1rem',
       }}
     >
-      {buttons.map((btn) => (
-        <button
-          key={btn.rating}
-          onClick={() => onRate(btn.rating)}
-          disabled={disabled}
-          style={{
-            minHeight: '60px',
-            padding: '1rem',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            color: '#fff',
-            backgroundColor: disabled ? '#ccc' : btn.color,
-            border: 'none',
-            borderRadius: '8px',
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.25rem',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          }}
-          onMouseEnter={(e) => {
-            if (!disabled) {
-              e.currentTarget.style.backgroundColor = btn.hoverColor
-              e.currentTarget.style.transform = 'translateY(-2px)'
-              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!disabled) {
-              e.currentTarget.style.backgroundColor = btn.color
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
-            }
-          }}
-        >
-          <span style={{ fontSize: '1rem' }}>{btn.label}</span>
-          <span
+      {buttons.map((btn) => {
+        const isSelected = selectedRating === btn.rating
+        return (
+          <button
+            key={btn.rating}
+            onClick={() => onRatingSelect(btn.rating)}
+            disabled={disabled}
             style={{
-              fontSize: '0.75rem',
-              opacity: 0.8,
-              fontFamily: 'monospace',
+              minHeight: '60px',
+              padding: '1rem',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: '#fff',
+              backgroundColor: disabled ? '#ccc' : btn.color,
+              border: isSelected ? '3px solid #212121' : 'none',
+              borderRadius: '8px',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.25rem',
+              boxShadow: isSelected 
+                ? '0 4px 12px rgba(0,0,0,0.25)' 
+                : '0 2px 4px rgba(0,0,0,0.1)',
+              transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+            }}
+            onMouseEnter={(e) => {
+              if (!disabled) {
+                e.currentTarget.style.backgroundColor = btn.hoverColor
+                if (!isSelected) {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                }
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!disabled) {
+                e.currentTarget.style.backgroundColor = btn.color
+                e.currentTarget.style.transform = isSelected ? 'scale(1.05)' : 'scale(1)'
+                e.currentTarget.style.boxShadow = isSelected 
+                  ? '0 4px 12px rgba(0,0,0,0.25)' 
+                  : '0 2px 4px rgba(0,0,0,0.1)'
+              }
             }}
           >
-            [{btn.key}]
-          </span>
-        </button>
-      ))}
+            <span style={{ fontSize: '1rem' }}>{btn.label}</span>
+            <span
+              style={{
+                fontSize: '0.75rem',
+                opacity: 0.8,
+                fontFamily: 'monospace',
+              }}
+            >
+              [{btn.key}]
+            </span>
+          </button>
+        )
+      })}
     </div>
   )
 }

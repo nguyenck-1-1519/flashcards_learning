@@ -1,10 +1,22 @@
 // Card queue logic for study sessions
-// Orders cards: new cards first, then by next_review date
+// Randomly selects maximum 10 cards for study session
 
 import { Card } from '@/types/card'
 
 export interface QueuedCard extends Card {
   // Additional queue-specific fields can be added here
+}
+
+// Randomly select cards for study session (max 10)
+export function selectRandomCards(cards: Card[], maxCards: number = 10): Card[] {
+  if (cards.length <= maxCards) {
+    // If deck has 10 or fewer cards, return all
+    return [...cards]
+  }
+  
+  // Shuffle and take first maxCards
+  const shuffled = [...cards].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, maxCards)
 }
 
 // Sort cards for study queue
@@ -23,9 +35,10 @@ export function sortCardsForStudy(cards: Card[]): QueuedCard[] {
   })
 }
 
-// Create study queue from cards
+// Create study queue from cards (random selection, max 10)
 export function createStudyQueue(cards: Card[]): QueuedCard[] {
-  return sortCardsForStudy(cards)
+  const selectedCards = selectRandomCards(cards, 10)
+  return selectedCards as QueuedCard[]
 }
 
 // Check if card is new (never reviewed)

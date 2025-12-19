@@ -18,6 +18,16 @@ import RatingButtons from '@/components/study/RatingButtons'
 import EmptyStudyState from '@/components/study/EmptyStudyState'
 import SessionSummary from '@/components/study/SessionSummary'
 
+// Helper function to update stats based on rating
+function getStatsUpdate(rating: Rating) {
+  return {
+    again: rating === Rating.Again ? 1 : 0,
+    hard: rating === Rating.Hard ? 1 : 0,
+    good: rating === Rating.Good ? 1 : 0,
+    easy: rating === Rating.Easy ? 1 : 0,
+  }
+}
+
 interface StudySessionClientProps {
   deck: Deck
   initialCards: Card[]
@@ -31,13 +41,13 @@ export default function StudySessionClient({
   const [cards, setCards] = useState<Card[]>(createStudyQueue(initialCards))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
-  const [isRating, setIsRating] = useState(false)
+  const [selectedRating, setSelectedRating] = useState<Rating | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
   const [sessionComplete, setSessionComplete] = useState(false)
   const [startTime] = useState(Date.now())
   const [showExitDialog, setShowExitDialog] = useState(false)
-  const [showAgainFeedback, setShowAgainFeedback] = useState(false)
   const [sessionStats, setSessionStats] = useState({
-    total: initialCards.length,
+    total: initialCards.length > 10 ? 10 : initialCards.length,
     reviewed: 0,
     again: 0,
     hard: 0,
@@ -49,11 +59,24 @@ export default function StudySessionClient({
   const hasCards = cards.length > 0
   const isLastCard = currentIndex === cards.length - 1
 
-  // Handle card rating
-  const handleRate = async (rating: Rating) => {
-    if (!currentCard || !isFlipped || isRating) return
+  // Reset states when card changes
+  useEffect(() => {
+    setIsFlipped(false)
+    setSelectedRating(null)
+  }, [currentIndex])
 
-    setIsRating(true)
+  // Handle rating selection
+  const handleRatingSelect = (rating: Rating) => {
+    if (!isFlipped) return
+    setSelectedRating(rating)
+  }
+
+  // Handle Next button click
+  const handleNext = async () => {
+    if (!selectedRating || !currentCard || isProcessing) return
+
+    setIsProcessing(true)
+    const rating: Rating = selectedRating // Type assertion for safety
 
     try {
       // Calculate next review using SM-2 algorithm
@@ -74,47 +97,70 @@ export default function StudySessionClient({
       )
 
       // Update session stats
+      const statsUpdate = getStatsUpdate(rating)
       setSessionStats((prev) => ({
         ...prev,
         reviewed: prev.reviewed + 1,
-        again: prev.again + (rating === Rating.Again ? 1 : 0),
-        hard: prev.hard + (rating === Rating.Hard ? 1 : 0),
-        good: prev.good + (rating === Rating.Good ? 1 : 0),
-        easy: prev.easy + (rating === Rating.Easy ? 1 : 0),
+        again: prev.again + statsUpdate.again,
+        hard: prev.hard + statsUpdate.hard,
+        good: prev.good + statsUpdate.good,
+        easy: prev.easy + statsUpdate.easy,
       }))
 
-      // If "Again" rating, add card back to queue
-      if (rating === Rating.Again && !isLastCard) {
-        const updatedCard = { ...currentCard, ...result }
-        setCards((prev) => {
-          const newCards = [...prev]
-          // Add card 3-5 cards ahead (or at end if not enough cards)
-          const insertPosition = Math.min(
-            currentIndex + 3 + Math.floor(Math.random() * 3),
-            newCards.length
-          )
-          newCards.splice(insertPosition, 0, updatedCard)
-          return newCards
-        })
-        
-        // Show "Again" feedback
-        setShowAgainFeedback(true)
-        setTimeout(() => setShowAgainFeedback(false), 2000)
-      }
-
       // Move to next card
-      if (isLastCard) {
-        // Session complete - show summary
-        setSessionComplete(true)
-      } else {
-        setCurrentIndex((prev) => prev + 1)
-        setIsFlipped(false)
-      }
+      setCurrentIndex((prev) => prev + 1)
+      setIsFlipped(false)
+      setSelectedRating(null)
     } catch (error) {
-      console.error('Failed to rate card:', error)
+      console.error('Failed to save card:', error)
       alert('Failed to save rating. Please try again.')
     } finally {
-      setIsRating(false)
+      setIsProcessing(false)
+    }
+  }
+
+  // Handle Complete button click
+  const handleComplete = async () => {
+    if (!selectedRating || !currentCard || isProcessing) return
+
+    setIsProcessing(true)
+    const rating: Rating = selectedRating // Type assertion for safety
+
+    try {
+      // Calculate next review using SM-2 algorithm
+      const result = calculateNextReview(
+        rating,
+        currentCard.ease_factor,
+        currentCard.interval,
+        currentCard.repetitions
+      )
+
+      // Update card in database
+      await updateCardWithReview(
+        currentCard.id,
+        result.ease_factor,
+        result.interval,
+        result.repetitions,
+        result.next_review
+      )
+
+      // Update session stats
+      const statsUpdate = getStatsUpdate(rating)
+      setSessionStats((prev) => ({
+        ...prev,
+        reviewed: prev.reviewed + 1,
+        again: prev.again + statsUpdate.again,
+        hard: prev.hard + statsUpdate.hard,
+        good: prev.good + statsUpdate.good,
+        easy: prev.easy + statsUpdate.easy,
+      }))
+
+      // Session complete - show summary
+      setSessionComplete(true)
+    } catch (error) {
+      console.error('Failed to save card:', error)
+      alert('Failed to save rating. Please try again.')
+      setIsProcessing(false)
     }
   }
 
@@ -233,7 +279,7 @@ export default function StudySessionClient({
                   Progress
                 </span>
                 <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#212121' }}>
-                  {currentIndex + 1} / {cards.length}
+                  Card {currentIndex + 1} of {cards.length}
                 </span>
               </div>
               <div
@@ -270,40 +316,90 @@ export default function StudySessionClient({
               </motion.div>
             </AnimatePresence>
 
-            {/* "Again" Feedback */}
-            <AnimatePresence>
-              {showAgainFeedback && (
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  style={{
-                    position: 'fixed',
-                    top: '5rem',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    backgroundColor: '#ff9800',
-                    color: '#fff',
-                    padding: '1rem 1.5rem',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                    zIndex: 999,
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <span>🔄</span>
-                  <span>Card added back to queue</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             {/* Rating Buttons - Only show when card is flipped */}
             {isFlipped && (
-              <RatingButtons onRate={handleRate} disabled={isRating} />
+              <>
+                <RatingButtons 
+                  onRatingSelect={handleRatingSelect} 
+                  selectedRating={selectedRating}
+                  disabled={isProcessing} 
+                />
+
+                {/* Next/Complete Button */}
+                <div style={{ maxWidth: '800px', margin: '2rem auto 0', padding: '0 1rem' }}>
+                  {isLastCard ? (
+                    <button
+                      onClick={handleComplete}
+                      disabled={!selectedRating || isProcessing}
+                      style={{
+                        width: '100%',
+                        padding: '1rem',
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: '#fff',
+                        backgroundColor: selectedRating && !isProcessing ? '#4caf50' : '#ccc',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: selectedRating && !isProcessing ? 'pointer' : 'not-allowed',
+                        transition: 'all 0.2s',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        opacity: selectedRating && !isProcessing ? 1 : 0.6,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedRating && !isProcessing) {
+                          e.currentTarget.style.backgroundColor = '#43a047'
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                          e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedRating && !isProcessing) {
+                          e.currentTarget.style.backgroundColor = '#4caf50'
+                          e.currentTarget.style.transform = 'translateY(0)'
+                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                        }
+                      }}
+                    >
+                      {isProcessing ? 'Saving...' : '✓ Complete Session'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleNext}
+                      disabled={!selectedRating || isProcessing}
+                      style={{
+                        width: '100%',
+                        padding: '1rem',
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        color: '#fff',
+                        backgroundColor: selectedRating && !isProcessing ? '#1976d2' : '#ccc',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: selectedRating && !isProcessing ? 'pointer' : 'not-allowed',
+                        transition: 'all 0.2s',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                        opacity: selectedRating && !isProcessing ? 1 : 0.6,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedRating && !isProcessing) {
+                          e.currentTarget.style.backgroundColor = '#1565c0'
+                          e.currentTarget.style.transform = 'translateY(-2px)'
+                          e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedRating && !isProcessing) {
+                          e.currentTarget.style.backgroundColor = '#1976d2'
+                          e.currentTarget.style.transform = 'translateY(0)'
+                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                        }
+                      }}
+                    >
+                      {isProcessing ? 'Saving...' : '→ Next Card'}
+                    </button>
+                  )}
+                </div>
+              </>
             )}
 
             {/* Session Stats */}
