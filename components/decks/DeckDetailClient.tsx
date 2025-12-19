@@ -1,6 +1,7 @@
 // DeckDetailClient - Client component for deck detail page
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { Deck } from '@/types/deck'
 import Breadcrumb from '@/components/ui/Breadcrumb'
 import LogoutButton from '@/components/auth/LogoutButton'
@@ -11,6 +12,8 @@ interface DeckDetailClientProps {
 }
 
 export default function DeckDetailClient({ deck, cards }: DeckDetailClientProps) {
+  const router = useRouter()
+
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#fafafa' }}>
       {/* Header */}
@@ -164,8 +167,7 @@ export default function DeckDetailClient({ deck, cards }: DeckDetailClientProps)
         >
           <button
             onClick={() => {
-              // TODO: Start study mode (Module 003)
-              alert('Study mode will be implemented in Module 003')
+              router.push(`/decks/${deck.id}/study`)
             }}
             disabled={cards.length === 0}
             style={{

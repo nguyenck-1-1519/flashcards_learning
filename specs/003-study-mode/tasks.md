@@ -17,10 +17,10 @@
 
 **Purpose**: Study mode infrastructure and markdown rendering setup
 
-- [ ] T001 Install dependencies (marked, isomorphic-dompurify, highlight.js, framer-motion, date-fns)
-- [ ] T002 [P] Create TypeScript types for Card with SM-2 fields in types/card.ts
-- [ ] T003 [P] Create TypeScript types for StudySession and Rating enum in types/study.ts
-- [ ] T004 [P] Create Zod validation schema for card content in lib/validations/card.ts
+- [X] T001 Install dependencies (marked, isomorphic-dompurify, highlight.js, framer-motion, date-fns)
+- [X] T002 [P] Create TypeScript types for Card with SM-2 fields in types/card.ts
+- [X] T003 [P] Create TypeScript types for StudySession and Rating enum in types/study.ts
+- [X] T004 [P] Create Zod validation schema for card content in lib/validations/card.ts
 
 ---
 
@@ -46,21 +46,21 @@
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
-- [ ] T006 Implement SM-2 algorithm in lib/study/sm2.ts with calculateNextReview function
-- [ ] T007 Implement Rating enum (Again=0, Hard=1, Good=2, Easy=3)
+- [X] T006 Implement SM-2 algorithm in lib/study/sm2.ts with calculateNextReview function
+- [X] T007 Implement Rating enum (Again=0, Hard=1, Good=2, Easy=3)
 - [ ] T008 Test SM-2 with edge cases (very long intervals, multiple consecutive "Again")
 
 **Verify**: Run tests from T005, all should PASS (green state)
 
 ### Database Setup
 
-- [ ] T009 Create database schema for cards table with SM-2 fields in lib/db/schema.sql
-- [ ] T010 Add constraints for SM-2 fields (ease_factor 1.3-3.0, interval >= 0)
-- [ ] T011 Run database migration to create cards table
+- [X] T009 Create database schema for cards table with SM-2 fields in lib/db/schema.sql
+- [X] T010 Add constraints for SM-2 fields (ease_factor 1.3-3.0, interval >= 0)
+- [X] T011 Run database migration to create cards table
 - [ ] T012 [P] Write unit tests for card queries in tests/unit/db/cards.test.ts
 - [ ] T013 [P] Write unit tests for getDueCards query in tests/unit/db/study.test.ts
-- [ ] T014 Create card CRUD query functions in lib/db/queries/cards.ts
-- [ ] T015 Create study-specific queries in lib/db/queries/study.ts (getDueCards, updateCardSchedule)
+- [X] T014 Create card CRUD query functions in lib/db/queries/cards.ts
+- [X] T015 Create study-specific queries in lib/db/queries/study.ts (getDueCards, updateCardSchedule)
 
 **Verify**: Run tests from T012-T013, all should PASS (green state)
 
@@ -68,11 +68,11 @@
 
 - [ ] T016 [P] Write unit tests for markdown parsing in tests/unit/markdown/parser.test.ts
 - [ ] T017 [P] Write unit tests for HTML sanitization in tests/unit/markdown/sanitize.test.ts
-- [ ] T018 Configure marked with syntax highlighting (highlight.js)
-- [ ] T019 Implement markdown parser in lib/markdown/parser.ts
-- [ ] T020 Implement HTML sanitization in lib/markdown/sanitize.ts (DOMPurify)
+- [X] T018 Configure marked with syntax highlighting (highlight.js)
+- [X] T019 Implement markdown parser in lib/markdown/parser.ts
+- [X] T020 Implement HTML sanitization in lib/markdown/sanitize.ts (DOMPurify)
 - [ ] T021 Test markdown with various syntax (headers, lists, code blocks, tables)
-- [ ] T022 Test XSS prevention (script tags, event handlers)
+- [X] T022 Test XSS prevention (script tags, event handlers)
 
 **Verify**: Run tests from T016-T017, all should PASS (green state)
 
@@ -97,15 +97,15 @@
 
 ### Implementation for User Story 1
 
-- [ ] T027 [US1] Create EmptyStudyState component in components/study/EmptyStudyState.tsx
-- [ ] T028 [US1] Create study page at app/decks/[deckId]/study/page.tsx
-- [ ] T029 [US1] Implement session initialization (fetch due cards from database)
-- [ ] T030 [US1] Create card queue logic in lib/study/queue.ts (new cards first, then by next_review)
-- [ ] T031 [US1] Add "Study" button to deck detail page
-- [ ] T032 [US1] Handle case when no cards are due (show EmptyStudyState)
-- [ ] T033 [US1] Add "Study All Cards Anyway" option
-- [ ] T034 [US1] Display first card's front side
-- [ ] T035 [US1] Test session starts with correct card order
+- [X] T027 [US1] Create EmptyStudyState component in components/study/EmptyStudyState.tsx
+- [X] T028 [US1] Create study page at app/decks/[deckId]/study/page.tsx
+- [X] T029 [US1] Implement session initialization (fetch due cards from database)
+- [X] T030 [US1] Create card queue logic in lib/study/queue.ts (new cards first, then by next_review)
+- [X] T031 [US1] Add "Study" button to deck detail page
+- [X] T032 [US1] Handle case when no cards are due (show EmptyStudyState)
+- [X] T033 [US1] Add "Study All Cards Anyway" option
+- [X] T034 [US1] Display first card's front side
+- [X] T035 [US1] Test session starts with correct card order
 
 **Verify**: Run tests from T023-T026, all should PASS (green state)
 
@@ -130,19 +130,19 @@
 
 ### Implementation for User Story 2
 
-- [ ] T040 [US2] Create MarkdownRenderer component in components/markdown/MarkdownRenderer.tsx
-- [ ] T041 [US2] Add CSS for markdown content (responsive, mobile-friendly)
-- [ ] T042 [US2] Create CardFront component with MarkdownRenderer in components/study/CardFront.tsx
-- [ ] T043 [US2] Create CardBack component with MarkdownRenderer in components/study/CardBack.tsx
-- [ ] T044 [US2] Create StudyCard component with flip state in components/study/StudyCard.tsx
-- [ ] T045 [US2] Implement 3D flip animation (180deg Y-axis rotation, 300ms)
-- [ ] T046 [US2] Use CSS transform3d for hardware acceleration
-- [ ] T047 [US2] Add flip triggers: button click, card tap (mobile), spacebar key
-- [ ] T048 [US2] Disable interactions during flip animation
-- [ ] T049 [US2] Test flip animation on iOS Safari (target: 60fps)
-- [ ] T050 [US2] Test flip animation on Android Chrome (target: 60fps)
-- [ ] T051 [US2] Test markdown renders correctly on both sides
-- [ ] T052 [US2] Test code blocks have syntax highlighting
+- [X] T040 [US2] Create MarkdownRenderer component in components/markdown/MarkdownRenderer.tsx
+- [X] T041 [US2] Add CSS for markdown content (responsive, mobile-friendly)
+- [X] T042 [US2] Create CardFront component with MarkdownRenderer in components/study/CardFront.tsx
+- [X] T043 [US2] Create CardBack component with MarkdownRenderer in components/study/CardBack.tsx
+- [X] T044 [US2] Create StudyCard component with flip state in components/study/StudyCard.tsx
+- [X] T045 [US2] Implement 3D flip animation (180deg Y-axis rotation, 300ms)
+- [X] T046 [US2] Use CSS transform3d for hardware acceleration
+- [X] T047 [US2] Add flip triggers: button click, card tap (mobile), spacebar key
+- [X] T048 [US2] Disable interactions during flip animation
+- [X] T049 [US2] Test flip animation on iOS Safari (target: 60fps)
+- [X] T050 [US2] Test flip animation on Android Chrome (target: 60fps)
+- [X] T051 [US2] Test markdown renders correctly on both sides
+- [X] T052 [US2] Test code blocks have syntax highlighting
 
 **Verify**: Run tests from T036-T039, all should PASS (green state)
 
@@ -168,21 +168,21 @@
 
 ### Implementation for User Story 3
 
-- [ ] T058 [US3] Create RatingButtons component with 4 buttons in components/study/RatingButtons.tsx
-- [ ] T059 [US3] Style rating buttons: Again (red), Hard (orange), Good (green), Easy (blue)
-- [ ] T060 [US3] Ensure rating buttons are 44px+ minimum on mobile
-- [ ] T061 [US3] Position rating buttons at bottom (thumb-reachable on mobile)
-- [ ] T062 [US3] Implement rateCard server action in app/actions/study.ts
-- [ ] T063 [US3] Integrate SM-2 algorithm in rateCard action
-- [ ] T064 [US3] Update card schedule in database (ease_factor, interval, repetitions, last_reviewed, next_review)
-- [ ] T065 [US3] Handle "Again" rating: interval=0, add back to session queue
-- [ ] T066 [US3] Get next card from queue after rating
-- [ ] T067 [US3] Implement optimistic UI update (show next card immediately)
-- [ ] T068 [US3] Add keyboard shortcuts: 1=Again, 2=Hard, 3=Good, 4=Easy
-- [ ] T069 [US3] Disable keyboard shortcuts while card is on front side
-- [ ] T070 [US3] Test rating updates schedule correctly for all 4 ratings
-- [ ] T071 [US3] Test "Again" card reappears later in session
-- [ ] T072 [US3] Test keyboard shortcuts work on desktop
+- [X] T058 [US3] Create RatingButtons component with 4 buttons in components/study/RatingButtons.tsx
+- [X] T059 [US3] Style rating buttons: Again (red), Hard (orange), Good (green), Easy (blue)
+- [X] T060 [US3] Ensure rating buttons are 44px+ minimum on mobile
+- [X] T061 [US3] Position rating buttons at bottom (thumb-reachable on mobile)
+- [X] T062 [US3] Implement rateCard server action in app/actions/study.ts
+- [X] T063 [US3] Integrate SM-2 algorithm in rateCard action
+- [X] T064 [US3] Update card schedule in database (ease_factor, interval, repetitions, last_reviewed, next_review)
+- [X] T065 [US3] Handle "Again" rating: interval=0, add back to session queue
+- [X] T066 [US3] Get next card from queue after rating
+- [X] T067 [US3] Implement optimistic UI update (show next card immediately)
+- [X] T068 [US3] Add keyboard shortcuts: 1=Again, 2=Hard, 3=Good, 4=Easy
+- [X] T069 [US3] Disable keyboard shortcuts while card is on front side
+- [X] T070 [US3] Test rating updates schedule correctly for all 4 ratings
+- [X] T071 [US3] Test "Again" card reappears later in session
+- [X] T072 [US3] Test keyboard shortcuts work on desktop
 
 **Verify**: Run tests from T053-T057, all should PASS (green state)
 
@@ -206,13 +206,13 @@
 
 ### Implementation for User Story 4
 
-- [ ] T076 [US4] Create SessionSummary component in components/study/SessionSummary.tsx
-- [ ] T077 [US4] Track session statistics (cards studied, rating breakdown, duration)
-- [ ] T078 [US4] Show summary when all cards reviewed
-- [ ] T079 [US4] Display statistics: total cards, Again/Hard/Good/Easy counts, time elapsed
-- [ ] T080 [US4] Add "Return to Deck" button to navigate back
-- [ ] T081 [US4] Add congratulatory message based on performance
-- [ ] T082 [US4] Test session summary displays correct statistics
+- [X] T076 [US4] Create SessionSummary component in components/study/SessionSummary.tsx
+- [X] T077 [US4] Track session statistics (cards studied, rating breakdown, duration)
+- [X] T078 [US4] Show summary when all cards reviewed
+- [X] T079 [US4] Display statistics: total cards, Again/Hard/Good/Easy counts, time elapsed
+- [X] T080 [US4] Add "Return to Deck" button to navigate back
+- [X] T081 [US4] Add congratulatory message based on performance
+- [X] T082 [US4] Test session summary displays correct statistics
 
 **Verify**: Run tests from T073-T075, all should PASS (green state)
 
@@ -236,13 +236,13 @@
 
 ### Implementation for User Story 5
 
-- [ ] T086 [US5] Create ProgressBar component in components/study/ProgressBar.tsx
-- [ ] T087 [US5] Display "Card X of Y" at top of study page
-- [ ] T088 [US5] Update current card number after each rating
-- [ ] T089 [US5] Increment total count when "Again" card added to queue
-- [ ] T090 [US5] Style progress bar for mobile visibility
-- [ ] T091 [US5] Test progress indicator updates correctly
-- [ ] T092 [US5] Test total count increases with "Again" ratings
+- [X] T086 [US5] Create ProgressBar component in components/study/ProgressBar.tsx
+- [X] T087 [US5] Display "Card X of Y" at top of study page
+- [X] T088 [US5] Update current card number after each rating
+- [X] T089 [US5] Increment total count when "Again" card added to queue
+- [X] T090 [US5] Style progress bar for mobile visibility
+- [X] T091 [US5] Test progress indicator updates correctly
+- [X] T092 [US5] Test total count increases with "Again" ratings
 
 **Verify**: Run tests from T083-T085, all should PASS (green state)
 
@@ -266,13 +266,13 @@
 
 ### Implementation for User Story 6
 
-- [ ] T096 [US6] Add "Exit" button to study page
-- [ ] T097 [US6] Create exit confirmation dialog
-- [ ] T098 [US6] Save progress on exit (reviewed cards have updated schedules)
-- [ ] T099 [US6] Ensure unreviewed cards keep their due status
-- [ ] T100 [US6] Redirect to deck detail page on exit
-- [ ] T101 [US6] Test exit confirmation shows correctly
-- [ ] T102 [US6] Test reviewed cards don't reappear immediately
+- [X] T096 [US6] Add "Exit" button to study page
+- [X] T097 [US6] Create exit confirmation dialog
+- [X] T098 [US6] Save progress on exit (reviewed cards have updated schedules)
+- [X] T099 [US6] Ensure unreviewed cards keep their due status
+- [X] T100 [US6] Redirect to deck detail page on exit
+- [X] T101 [US6] Test exit confirmation shows correctly
+- [X] T102 [US6] Test reviewed cards don't reappear immediately
 
 **Verify**: Run tests from T093-T095, all should PASS (green state)
 
@@ -373,11 +373,11 @@
 
 **Purpose**: Final improvements
 
-- [ ] T138 [P] Add loading states for session initialization
-- [ ] T139 [P] Add transition animations between cards
-- [ ] T140 [P] Add visual feedback when card is added to queue ("Again" rating)
-- [ ] T141 Style code blocks in markdown with proper highlighting
-- [ ] T142 Make tables in markdown responsive (horizontal scroll on mobile)
+- [X] T138 [P] Add loading states for session initialization
+- [X] T139 [P] Add transition animations between cards
+- [X] T140 [P] Add visual feedback when card is added to queue ("Again" rating)
+- [X] T141 Style code blocks in markdown with proper highlighting
+- [X] T142 Make tables in markdown responsive (horizontal scroll on mobile)
 - [ ] T143 Add "Study Statistics" page showing overall progress
 - [ ] T144 Add session timer display
 - [ ] T145 Support LaTeX/math notation in markdown (optional enhancement)

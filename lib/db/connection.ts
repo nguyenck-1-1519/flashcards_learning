@@ -58,3 +58,6 @@ export async function closePool(): Promise<void> {
     pool = null
   }
 }
+
+// Default export for backwards compatibility
+export default getPool()
