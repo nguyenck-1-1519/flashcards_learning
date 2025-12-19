@@ -1,16 +1,21 @@
 // DashboardClient - Client component for interactive deck management
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { User } from '@/types/auth'
 import { DeckWithStats } from '@/types/deck'
 import LogoutButton from '@/components/auth/LogoutButton'
 import DeckGrid from '@/components/dashboard/DeckGrid'
 import EmptyState from '@/components/dashboard/EmptyState'
+import DeckFilters, { sortDecks, filterDecks, SortOption } from '@/components/dashboard/DeckFilters'
+import DeckStatistics from '@/components/dashboard/DeckStatistics'
+import Pagination from '@/components/ui/Pagination'
+import { usePagination } from '@/lib/hooks/usePagination'
 import CreateDeckModal from '@/components/decks/CreateDeckModal'
 import EditDeckModal from '@/components/decks/EditDeckModal'
 import DeleteDeckDialog from '@/components/decks/DeleteDeckDialog'
+import FAB from '@/components/ui/FAB'
 import {
   createDeckAction,
   updateDeckAction,
@@ -30,6 +35,40 @@ export default function DashboardClient({ user, initialDecks }: DashboardClientP
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedDeck, setSelectedDeck] = useState<DeckWithStats | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [isMobile, setIsMobile] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortOption, setSortOption] = useState<SortOption>('date-desc')
+
+  // Filter and sort decks
+  const filteredDecks = filterDecks(decks, searchQuery)
+  const displayedDecks = sortDecks(filteredDecks, sortOption)
+
+  // Pagination
+  const {
+    currentPage,
+    totalPages,
+    paginatedItems: paginatedDecks,
+    goToPage,
+    nextPage,
+    previousPage,
+    canGoNext,
+    canGoPrevious,
+  } = usePagination({
+    items: displayedDecks,
+    itemsPerPage: 12,
+  })
+
+  // Check if viewport is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Navigate to deck detail
   const handleDeckClick = (deck: DeckWithStats) => {
@@ -162,7 +201,7 @@ export default function DashboardClient({ user, initialDecks }: DashboardClientP
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#212121', margin: 0 }}>
             Your Decks
           </h2>
-          {decks.length > 0 && (
+          {decks.length > 0 && !isMobile && (
             <button
               onClick={() => setIsCreateModalOpen(true)}
               style={{
@@ -193,14 +232,68 @@ export default function DashboardClient({ user, initialDecks }: DashboardClientP
         {decks.length === 0 ? (
           <EmptyState onCreateClick={() => setIsCreateModalOpen(true)} />
         ) : (
-          <DeckGrid
-            decks={decks}
-            onEdit={openEditModal}
-            onDelete={openDeleteDialog}
-            onClick={handleDeckClick}
-          />
+          <>
+            {/* Statistics */}
+            <DeckStatistics decks={decks} />
+
+            {/* Filters */}
+            <DeckFilters
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              sortOption={sortOption}
+              onSortChange={setSortOption}
+              totalDecks={decks.length}
+              filteredCount={filteredDecks.length}
+            />
+
+            {/* Deck Grid */}
+            {displayedDecks.length === 0 ? (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '3rem 1rem',
+                  color: '#666',
+                }}
+              >
+                <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>
+                  No decks found
+                </p>
+                <p style={{ fontSize: '0.875rem' }}>
+                  Try adjusting your search query
+                </p>
+              </div>
+            ) : (
+              <>
+                <DeckGrid
+                  decks={paginatedDecks}
+                  onEdit={openEditModal}
+                  onDelete={openDeleteDialog}
+                  onClick={handleDeckClick}
+                />
+
+                {/* Pagination */}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={goToPage}
+                  onNext={nextPage}
+                  onPrevious={previousPage}
+                  canGoNext={canGoNext}
+                  canGoPrevious={canGoPrevious}
+                />
+              </>
+            )}
+          </>
         )}
       </div>
+
+      {/* FAB for mobile */}
+      {isMobile && decks.length > 0 && (
+        <FAB
+          onClick={() => setIsCreateModalOpen(true)}
+          ariaLabel="Create new deck"
+        />
+      )}
 
       {/* Modals */}
       <CreateDeckModal
