@@ -15,12 +15,13 @@
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Study mode infrastructure and markdown rendering setup
+**Purpose**: Study mode infrastructure, card management, and markdown rendering setup
 
 - [X] T001 Install dependencies (marked, isomorphic-dompurify, highlight.js, framer-motion, date-fns)
 - [X] T002 [P] Create TypeScript types for Card with SM-2 fields in types/card.ts
 - [X] T003 [P] Create TypeScript types for StudySession and Rating enum in types/study.ts
 - [X] T004 [P] Create Zod validation schema for card content in lib/validations/card.ts
+- [X] T004a [P] Create server actions for card CRUD operations in app/actions/cards.ts
 
 ---
 
@@ -77,6 +78,130 @@
 **Verify**: Run tests from T016-T017, all should PASS (green state)
 
 **Checkpoint**: SM-2 algorithm tested and working, markdown rendering secure, database ready
+
+---
+
+## Phase 2.5: Card Management - View & CRUD (Priority: P1) 🎯 ESSENTIAL
+
+**Goal**: Users can view, add, edit, and delete cards in their decks
+
+**Why before Study Mode**: Users need to create and manage cards before they can study them. This is a foundational requirement.
+
+**Independent Test**: Open deck → see card list → add/edit/delete cards → verify changes persist
+
+**Reference**: See `/specs/003-study-mode/card-management-requirements.md` for detailed requirements
+
+### User Story: View Deck with Cards (Priority: P1) ✅ COMPLETE
+
+**Acceptance**: Users can view all cards in list or grid layout, toggle between views
+
+- [X] T034a [P] [CARD-VIEW] Create DeckDetailClient component in components/decks/DeckDetailClient.tsx
+- [X] T034b [P] [CARD-VIEW] Add view mode state management (list/grid toggle)
+- [X] T034c [P] [CARD-VIEW] Implement list view layout (flex column, 0.5rem gap)
+- [X] T034d [P] [CARD-VIEW] Implement grid view layout (CSS grid, 280px min columns, 1rem gap)
+- [X] T034e [P] [CARD-VIEW] Add toggle buttons with Material Design styling (📋 List / 📱 Grid)
+- [X] T034f [P] [CARD-VIEW] Display card preview with front/back truncated at 150 chars
+- [X] T034g [P] [CARD-VIEW] Add hover effects on cards (border color, shadow)
+- [X] T034h [P] [CARD-VIEW] Implement empty state when deck has no cards
+- [X] T034i [P] [CARD-VIEW] Add card count display in header "Cards (X)"
+
+**Verify**: ✅ Open deck → Cards display in list/grid → Toggle works → Hover effects → Empty state tested
+
+### User Story: Add New Card (Priority: P1) ✅ COMPLETE
+
+**Acceptance**: Users can add new cards with front/back content, validation works, card appears immediately
+
+- [X] T034j [P] [CARD-ADD] Create AddCardModal component in components/cards/AddCardModal.tsx
+- [X] T034k [P] [CARD-ADD] Implement tabbed interface (Front/Back tabs)
+- [X] T034l [P] [CARD-ADD] Add textarea with markdown support
+- [X] T034m [P] [CARD-ADD] Implement validation (required fields, max 10k chars, trim whitespace)
+- [X] T034n [P] [CARD-ADD] Add discard confirmation when closing with unsaved content
+- [X] T034o [P] [CARD-ADD] Implement framer-motion animations (scale, fade)
+- [X] T034p [P] [CARD-ADD] Create server action addCard(deckId, front, back) with auth/validation
+- [X] T034q [P] [CARD-ADD] Integrate modal into DeckDetailClient with "Add Card" button
+- [X] T034r [P] [CARD-ADD] Implement real-time UI update after adding (router.refresh)
+- [X] T034s [P] [CARD-ADD] Add Material Design styling consistent with dashboard
+
+**Verify**: ✅ Click "Add Card" → Modal opens → Fill content → Validation works → Card appears instantly
+
+### User Story: Edit Existing Card (Priority: P1) ✅ COMPLETE
+
+**Acceptance**: Users can edit cards, changes persist, validation works
+
+- [X] T034t [P] [CARD-EDIT] Create server action editCard(cardId, deckId, front, back) with auth/validation
+- [X] T034u [P] [CARD-EDIT] Create EditCardModal component mirroring AddCardModal structure
+- [X] T034v [P] [CARD-EDIT] Add pre-population of form with existing card data (card.front, card.back)
+- [X] T034w [P] [CARD-EDIT] Add edit button to each card in list/grid view
+- [X] T034x [P] [CARD-EDIT] Add state management (isEditModalOpen, selectedCard)
+- [X] T034y [P] [CARD-EDIT] Implement handleEditCard function with router.refresh
+- [X] T034z [P] [CARD-EDIT] Apply same validation as AddCardModal (required, max 10k chars)
+- [X] T034aa [CARD-EDIT] Test edit functionality: open modal → modify content → save → verify update
+
+**Verify**: ✅ Click edit button → Modal opens with current content → Modify → Save → Changes appear
+
+### User Story: Delete Card (Priority: P2) ✅ COMPLETE
+
+**Acceptance**: Users can delete cards with confirmation, card disappears immediately
+
+- [X] T034ab [P] [CARD-DELETE] Create server action removeCard(cardId, deckId) with auth/validation
+- [X] T034ac [P] [CARD-DELETE] Create DeleteConfirmDialog component with card preview
+- [X] T034ad [P] [CARD-DELETE] Add delete button to each card in list/grid view
+- [X] T034ae [P] [CARD-DELETE] Add state management (isDeleteDialogOpen, selectedCard)
+- [X] T034af [P] [CARD-DELETE] Show confirmation: "Delete this card? This action cannot be undone."
+- [X] T034ag [P] [CARD-DELETE] Implement handleDeleteCard function with router.refresh
+- [X] T034ah [P] [CARD-DELETE] Handle empty state after deleting last card
+- [X] T034ai [CARD-DELETE] Test delete functionality: click delete → confirm → card disappears
+
+**Verify**: ✅ Click delete button → Confirmation shows → Confirm → Card disappears → Empty state if last card
+
+### User Story: View Full Card Content (Priority: P3) ❌ NOT STARTED
+
+**Acceptance**: Users can view complete card content without truncation, markdown rendered properly
+
+- [ ] T034aj [P] [CARD-DETAIL] Create CardDetailModal component
+- [ ] T034ak [P] [CARD-DETAIL] Render full content with MarkdownRenderer (no truncation)
+- [ ] T034al [P] [CARD-DETAIL] Include syntax highlighting for code blocks
+- [ ] T034am [P] [CARD-DETAIL] Add "View Full" button or click handler on cards
+- [ ] T034an [P] [CARD-DETAIL] Include edit/delete actions in detail modal
+- [ ] T034ao [CARD-DETAIL] Test full content view: click card → modal opens → full markdown displays
+
+**Verify**: Pending - Click card → Modal shows full content → Markdown formatted → Code highlighted
+
+### Card Management Testing Checklist
+
+**Completed Tests** ✅:
+- [X] View deck with cards in list layout
+- [X] View deck with cards in grid layout
+- [X] Toggle between list and grid views
+- [X] Empty state when deck has no cards
+- [X] Add card with valid content
+- [X] Add card validation (required fields, max length)
+- [X] Discard confirmation on modal close
+- [X] Real-time UI update after adding card
+- [X] Hover effects on cards
+- [X] Card content truncation at 150 chars
+- [X] Edit card with valid content
+- [X] Edit card validation
+- [X] UI update after edit
+- [X] Delete card with confirmation
+- [X] UI update after delete
+- [X] Empty state after deleting last card
+
+**Pending Tests** ⚠️:
+- [ ] Full content view with markdown rendering
+- [ ] Error handling for network failures
+- [ ] Mobile touch interactions (44x44px buttons) - Implemented but not formally tested
+- [ ] Keyboard navigation through cards
+
+**Edge Cases to Test**:
+- [ ] Very long card content (> 10k chars validation)
+- [ ] Card with only whitespace (trim validation)
+- [ ] Concurrent edits by multiple users
+- [ ] Network error during card operations
+- [ ] Special characters and emojis in content
+- [ ] Markdown edge cases (nested lists, tables)
+
+**Checkpoint**: Card Management - 100% complete (Edit/Delete CRUD operations fully functional) ✅
 
 ---
 
@@ -421,6 +546,8 @@
 
 ```
 Setup → Foundational (SM-2 + Markdown + DB) → 
+  Card Management (View + Add + Edit + Delete) →
+    [ESSENTIAL - Users need cards to study!]
   US1 (Start) → US2 (Flip) → US3 (Rate) → 
     [MVP COMPLETE - Can study flashcards!]
   → US4 (Summary) → US5 (Progress) → US6 (Exit) →
@@ -439,6 +566,17 @@ T006-T008 (SM-2) + T019-T022 (Markdown)
 T014 (card queries) + T015 (study queries)
 ```
 
+**Within Card Management (Phase 2.5)** ✅ Completed in parallel:
+```bash
+# Server actions + UI components built concurrently:
+T034p (addCard action) + T034t (editCard action) + T034ab (removeCard action)
+T034j-T034s (AddCardModal) + T034a-T034i (DeckDetailClient with list/grid)
+
+# Remaining work can be done in parallel:
+T034u-T034aa (EditCardModal) + T034ac-T034ai (DeleteConfirmDialog)
+T034aj-T034ao (CardDetailModal) - Optional, can be deferred
+```
+
 **Within User Story 2 (Flip)**:
 ```bash
 # Components in parallel:
@@ -454,7 +592,7 @@ T062-T066 (Server action with SM-2)
 ```
 
 **Across User Stories** (with multiple developers):
-- Developer A: US1 → US2 → US3 (critical path)
+- Developer A: Card Management (Edit/Delete UI) → US1 → US2 → US3 (critical path)
 - Developer B: After US3, work on US4 + US5 + US6
 - Developer C: After US2, work on Mobile + Accessibility
 
@@ -462,28 +600,83 @@ T062-T066 (Server action with SM-2)
 
 ## Implementation Strategy
 
-### MVP First (Basic Study Flow Only)
+### MVP First (Basic Study Flow + Card Management)
 
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (especially SM-2!) ✅ Foundation ready
-3. Complete Phase 3: US1 (Start Session) ✅ Can start studying
-4. Complete Phase 4: US2 (Flip Card) ✅ Can see answers
-5. Complete Phase 5: US3 (Rate Card) ✅ Spaced repetition works!
-6. **STOP and VALIDATE**: Core study loop works with SM-2
-7. Deploy MVP - users can study flashcards with spaced repetition
+1. Complete Phase 1: Setup ✅
+2. Complete Phase 2: Foundational (especially SM-2!) ✅
+3. **Complete Phase 2.5: Card Management ⚠️ 62.5% complete**
+   - ✅ View Deck (List/Grid)
+   - ✅ Add Card
+   - 🚧 Edit Card (server action ready, UI missing)
+   - 🚧 Delete Card (server action ready, UI missing)
+   - ❌ Full Content View (optional, can defer)
+4. Complete Phase 3: US1 (Start Session) ✅
+5. Complete Phase 4: US2 (Flip Card) ✅
+6. Complete Phase 5: US3 (Rate Card) ✅
+7. **STOP and VALIDATE**: Core study loop works with SM-2 ✅
+8. Deploy MVP - users can study flashcards with spaced repetition
+
+### Immediate Next Steps (High Priority)
+
+**Complete Card Management CRUD** (Required before full MVP):
+1. Create EditCardModal component (2-3 hours)
+   - Copy AddCardModal.tsx structure
+   - Add props for initial card data
+   - Pre-populate front/back content
+   - Update submit handler to call editCard action
+   
+2. Create DeleteConfirmDialog component (1-2 hours)
+   - Simple confirmation dialog
+   - Show card preview (truncated front/back)
+   - "Delete" and "Cancel" buttons
+   - Call removeCard action on confirm
+   
+3. Add Edit/Delete buttons to cards (30 min)
+   - Add buttons to card rendering in DeckDetailClient
+   - Style with Material Design
+   - Wire up modal state management
+
+**Estimated Total**: 4-6 hours to complete CRUD operations
 
 ### Incremental Delivery
 
-1. Foundation (SM-2 + Markdown) → Test extensively
-2. Add Start Session (US1) → Test independently → Deploy
-3. Add Flip (US2) → Test independently → Deploy
-4. Add Rating (US3) → Test independently → Deploy (MVP!)
-5. Add Summary (US4) → Deploy
-6. Add Progress (US5) → Deploy
-7. Add Exit (US6) → Deploy
-8. Add Mobile optimizations → Deploy
-9. Add Accessibility → Deploy
-10. Each addition enhances experience without breaking previous work
+1. Foundation (SM-2 + Markdown) → Test extensively ✅
+2. Add Card Management - View & Add → Test independently → Deploy ✅
+3. Add Card Management - Edit & Delete → Test independently → Deploy ⚠️ NEXT
+4. Add Start Session (US1) → Test independently → Deploy ✅
+5. Add Flip (US2) → Test independently → Deploy ✅
+6. Add Rating (US3) → Test independently → Deploy (MVP!) ✅
+7. Add Summary (US4) → Deploy ✅
+8. Add Progress (US5) → Deploy ✅
+9. Add Exit (US6) → Deploy ✅
+10. Add Mobile optimizations → Deploy
+11. Add Accessibility → Deploy
+12. Each addition enhances experience without breaking previous work
+
+### Current Status Summary
+
+**✅ Completed (75% of MVP)**:
+- Phase 1: Setup
+- Phase 2: Foundational (SM-2, Markdown, Database)
+- Phase 2.5: Card Management - View & Add (62.5%)
+- Phase 3: US1 - Start Study Session
+- Phase 4: US2 - Flip Card
+- Phase 5: US3 - Rate Card with SM-2
+- Phase 6: US4 - Complete Study Session
+- Phase 7: US5 - Progress Tracking
+- Phase 8: US6 - Exit Study Session
+- Phase 12: Partial Polish (animations, syntax highlighting)
+
+**🚧 Partially Complete**:
+- Phase 2.5: Card Management - Edit & Delete (server actions exist, UI missing)
+
+**❌ Not Started**:
+- Phase 9: Mobile Optimizations & Gestures
+- Phase 10: Accessibility
+- Phase 11: Edge Cases & Performance
+- Phase 12: Remaining Polish items
+
+**Next Critical Task**: Complete Edit/Delete card UI to finish CRUD operations (4-6 hours estimated)
 
 ---
 

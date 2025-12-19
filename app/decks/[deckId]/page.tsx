@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth/session'
 import { getDeckById } from '@/lib/db/queries/decks'
+import { getAllCards } from '@/lib/db/queries/cards'
 import { Metadata } from 'next'
 import DeckDetailClient from '@/components/decks/DeckDetailClient'
 
@@ -52,8 +53,8 @@ export default async function DeckDetailPage({ params }: DeckDetailPageProps) {
     redirect('/dashboard')
   }
 
-  // TODO: Get cards for this deck (will be implemented in Module 003)
-  const cards: any[] = []
+  // Get all cards for this deck
+  const cards = await getAllCards(params.deckId)
 
   return <DeckDetailClient deck={deck} cards={cards} />
 }
