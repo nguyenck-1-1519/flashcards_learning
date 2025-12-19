@@ -2,6 +2,7 @@
 // Displays cards for spaced repetition study
 
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { getSession } from '@/lib/auth/session'
 import { getDeckById } from '@/lib/db/queries/decks'
 import { getDueCards } from '@/lib/db/queries/study'
@@ -15,7 +16,8 @@ interface StudyPageProps {
 
 export default async function StudyPage({ params }: StudyPageProps) {
   // Check authentication
-  const session = await getSession()
+  const sessionCookie = cookies().get('session')
+  const session = await getSession(sessionCookie?.value)
   if (!session) {
     redirect('/login')
   }
