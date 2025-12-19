@@ -279,18 +279,20 @@
 
 ## Phase 5: User Story 3 - Rate Card and Navigate (Priority: P1) 🎯 MVP
 
-**Goal**: Users select rating, then click Next to advance to next card (or Complete on last card)
+**Goal**: Users select rating (button highlights), Next button enables, click Next to save and advance to next unflipped card
 
-**Independent Test**: Flip card → select rating → Next button enables → click Next → SM-2 updates → next card shows
+**Independent Test**: Flip card → select rating → Next enables → click Next → SM-2 saves → next card shows (front, unflipped)
 
 ### Tests for User Story 3 - Write FIRST, verify they FAIL
 
 - [ ] T053 [P] [US3] Write component test for RatingButtons rendering in tests/unit/components/RatingButtons.test.tsx
 - [ ] T053a [P] [US3] Write test for rating selection (highlight selected rating) in tests/unit/components/RatingButtons.test.tsx
-- [ ] T053b [P] [US3] Write test for Next button state (disabled until rating selected) in tests/unit/components/StudySessionClient.test.tsx
+- [ ] T053b [P] [US3] Write test for rating re-selection (user changes mind) in tests/unit/components/RatingButtons.test.tsx
+- [ ] T053c [P] [US3] Write test for Next button state (disabled until rating selected) in tests/unit/components/StudySessionClient.test.tsx
 - [ ] T054 [P] [US3] Write integration test for Next button updating card schedule in tests/integration/study/rate-card.test.ts
 - [ ] T055 [P] [US3] Write test for Complete button on last card in tests/integration/study/rate-card.test.ts
-- [ ] T056 [P] [US3] Write integration test for next card appearing after Next click in tests/integration/study/rate-card.test.ts
+- [ ] T056 [P] [US3] Write integration test for next card appearing unflipped after Next click in tests/integration/study/rate-card.test.ts
+- [ ] T056a [P] [US3] Write test for rating reset when advancing to next card in tests/integration/study/rate-card.test.ts
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
@@ -310,48 +312,70 @@
 - [X] T062a [US3] Handle rating selection (update state, enable Next button)
 - [X] T062b [US3] Handle Next button click (apply SM-2, save to DB, advance to next card)
 - [X] T062c [US3] Handle Complete button click (apply SM-2, save to DB, show summary)
+- [X] T062d [US3] Allow user to change rating selection before clicking Next (highlight updates)
 - [X] T063 [US3] Integrate SM-2 algorithm when Next/Complete is clicked
 - [X] T064 [US3] Update card schedule in database (ease_factor, interval, repetitions, last_reviewed, next_review)
 - [X] T066 [US3] Advance to next card's front side (not flipped) after Next click
 - [X] T066a [US3] Reset card flip state when advancing to next card
 - [X] T066b [US3] Reset selectedRating state when advancing
+- [X] T066c [US3] Disable Next button again after advancing to new card
 - [ ] T070 [US3] Test rating updates schedule correctly for all 4 ratings
 - [ ] T071 [US3] Test Next button disabled until rating selected
+- [ ] T071a [US3] Test Next button re-disables when advancing to new card
 - [ ] T072 [US3] Test Complete button appears on last card
+- [ ] T072a [US3] Test user can change rating selection before clicking Next
 
-**Verify**: Run tests from T053-T057, all should PASS (green state)
+**Verify**: Run tests from T053-T056a, all should PASS (green state)
 
-**Checkpoint**: Card rating works with SM-2 scheduling
+**Checkpoint**: Card rating with Next button flow works correctly
 
 ---
 
-## Phase 6: User Story 4 - Complete Study Session (Priority: P2)
+## Phase 6: User Story 4 - Complete Study Session with Dashboard Redirect (Priority: P2)
 
-**Goal**: After rating last card and clicking Complete, show session summary with statistics
+**Goal**: Click Complete on last card → saves card → redirects to dashboard → shows congratulatory pop-up with stats
 
-**Independent Test**: Rate last card → click Complete → all cards saved with SM-2 schedules → summary shows with stats
+**Independent Test**: Rate last card → click Complete → redirect to dashboard → pop-up shows "Chúc mừng! Bạn đã hoàn thành [X] thẻ!" with statistics
 
 ### Tests for User Story 4 - Write FIRST, verify they FAIL
 
-- [ ] T073 [P] [US4] Write component test for SessionSummary in tests/unit/components/SessionSummary.test.tsx
-- [ ] T074 [P] [US4] Write integration test for Complete button triggering summary in tests/integration/study/complete-session.test.ts
-- [ ] T075 [P] [US4] Write test for session statistics calculation (max 10 cards) in tests/integration/study/session-stats.test.ts
+- [ ] T073 [P] [US4] Write component test for CongratulationsModal in tests/unit/components/CongratulationsModal.test.tsx
+- [ ] T073a [P] [US4] Write test for modal displaying session statistics in tests/unit/components/CongratulationsModal.test.tsx
+- [ ] T074 [P] [US4] Write integration test for Complete button redirecting to dashboard in tests/integration/study/complete-session.test.ts
+- [ ] T074a [P] [US4] Write test for congratulatory pop-up appearing on dashboard in tests/integration/study/complete-session.test.ts
+- [ ] T075 [P] [US4] Write test for session statistics passed to dashboard (max 10 cards) in tests/integration/study/session-stats.test.ts
+- [ ] T075a [P] [US4] Write test for modal dismiss behavior (OK button and close icon) in tests/unit/components/CongratulationsModal.test.tsx
 
 **Verify**: Run tests, confirm all FAIL (red state)
 
 ### Implementation for User Story 4
 
-- [X] T076 [US4] Create SessionSummary component in components/study/SessionSummary.tsx
-- [X] T077 [US4] Track session statistics (cards studied max 10, rating breakdown, duration)
-- [X] T078 [US4] Show summary when Complete button clicked on last card
-- [X] T079 [US4] Display statistics: total cards (max 10), Again/Hard/Good/Easy counts, time elapsed
-- [X] T080 [US4] Add "Return to Deck" button to navigate back to deck detail
-- [X] T081 [US4] Add congratulatory message based on performance
-- [ ] T082 [US4] Test session summary displays correct statistics for sessions with <10 cards
+- [X] T076 [US4] Create CongratulationsModal component in components/study/CongratulationsModal.tsx
+- [X] T076a [US4] Add modal UI with celebration icon (🎉) and Vietnamese message "Chúc mừng! Bạn đã hoàn thành [X] thẻ!"
+- [X] T076b [US4] Display session statistics in modal: total cards, rating breakdown (Again/Hard/Good/Easy), study time
+- [X] T076c [US4] Add OK button to dismiss modal
+- [X] T076d [US4] Add close icon (X) in top-right corner to dismiss modal
+- [X] T076e [US4] Style modal with Material Design (elevation, rounded corners, responsive)
+- [X] T077 [US4] Update StudySessionClient to track session statistics (cards studied max 10, rating breakdown, duration)
+- [X] T078 [US4] Update handleComplete to redirect to dashboard with session stats in URL params
+- [X] T078a [US4] Pass session statistics via URL query params (totalCards, again, hard, good, easy, duration)
+- [X] T078b [US4] Use router.push('/dashboard?completed=true&stats=...') for redirect
+- [X] T079 [US4] Update dashboard page to check for completion query params
+- [X] T079a [US4] Parse session statistics from URL params on dashboard load
+- [X] T079b [US4] Show CongratulationsModal if completed=true query param exists
+- [X] T079c [US4] Pass parsed statistics to CongratulationsModal component
+- [X] T080 [US4] Handle modal dismiss: clear query params and hide modal
+- [X] T080a [US4] Use router.replace('/dashboard') to remove query params when modal closes
+- [X] T081 [US4] Add error handling for Complete button (network failure)
+- [X] T081a [US4] Show error message if save fails: "Không thể lưu kết quả. Vui lòng thử lại."
+- [X] T081b [US4] Keep user on study page if error occurs, allow retry
+- [ ] T082 [US4] Test Complete flow: last card → rate → Complete → dashboard → pop-up → dismiss
+- [ ] T082a [US4] Test session summary displays correct statistics for sessions with <10 cards
+- [ ] T082b [US4] Test error handling when network fails during Complete
 
-**Verify**: Run tests from T073-T075, all should PASS (green state)
+**Verify**: Run tests from T073-T075a, all should PASS (green state)
 
-**Checkpoint**: Study sessions complete with meaningful feedback
+**Checkpoint**: Complete session flow with dashboard redirect and congratulations works
 
 ---
 

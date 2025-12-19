@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useTransition, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { User } from '@/types/auth'
 import { DeckWithStats } from '@/types/deck'
 import LogoutButton from '@/components/auth/LogoutButton'
@@ -15,6 +15,7 @@ import { usePagination } from '@/lib/hooks/usePagination'
 import CreateDeckModal from '@/components/decks/CreateDeckModal'
 import EditDeckModal from '@/components/decks/EditDeckModal'
 import DeleteDeckDialog from '@/components/decks/DeleteDeckDialog'
+import CongratulationsModal from '@/components/study/CongratulationsModal'
 import FAB from '@/components/ui/FAB'
 import {
   createDeckAction,
@@ -29,6 +30,7 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ user, initialDecks }: DashboardClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [decks, setDecks] = useState(initialDecks)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -38,6 +40,40 @@ export default function DashboardClient({ user, initialDecks }: DashboardClientP
   const [isMobile, setIsMobile] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOption, setSortOption] = useState<SortOption>('date-desc')
+  
+  // Congratulations modal state
+  const [showCongrats, setShowCongrats] = useState(false)
+  const [sessionStats, setSessionStats] = useState({
+    totalCards: 0,
+    again: 0,
+    hard: 0,
+    good: 0,
+    easy: 0,
+    duration: 0,
+  })
+
+  // Check for completion query params on mount
+  useEffect(() => {
+    const completed = searchParams.get('completed')
+    if (completed === 'true') {
+      const totalCards = parseInt(searchParams.get('totalCards') || '0')
+      const again = parseInt(searchParams.get('again') || '0')
+      const hard = parseInt(searchParams.get('hard') || '0')
+      const good = parseInt(searchParams.get('good') || '0')
+      const easy = parseInt(searchParams.get('easy') || '0')
+      const duration = parseInt(searchParams.get('duration') || '0')
+      
+      setSessionStats({ totalCards, again, hard, good, easy, duration })
+      setShowCongrats(true)
+    }
+  }, [searchParams])
+
+  // Handle congratulations modal close
+  const handleCloseCongratsModal = () => {
+    setShowCongrats(false)
+    // Clear query params
+    router.replace('/dashboard')
+  }
 
   // Filter and sort decks
   const filteredDecks = filterDecks(decks, searchQuery)
@@ -320,6 +356,18 @@ export default function DashboardClient({ user, initialDecks }: DashboardClientP
         }}
         deck={selectedDeck}
         onDeleteDeck={handleDeleteDeck}
+      />
+
+      {/* Congratulations Modal */}
+      <CongratulationsModal
+        isOpen={showCongrats}
+        onClose={handleCloseCongratsModal}
+        totalCards={sessionStats.totalCards}
+        again={sessionStats.again}
+        hard={sessionStats.hard}
+        good={sessionStats.good}
+        easy={sessionStats.easy}
+        duration={sessionStats.duration}
       />
     </main>
   )

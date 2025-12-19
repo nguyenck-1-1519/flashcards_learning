@@ -124,7 +124,7 @@ export default function StudySessionClient({
     if (!selectedRating || !currentCard || isProcessing) return
 
     setIsProcessing(true)
-    const rating: Rating = selectedRating // Type assertion for safety
+    const rating: Rating = selectedRating
 
     try {
       // Calculate next review using SM-2 algorithm
@@ -144,22 +144,27 @@ export default function StudySessionClient({
         result.next_review
       )
 
-      // Update session stats
+      // Calculate final session stats
       const statsUpdate = getStatsUpdate(rating)
-      setSessionStats((prev) => ({
-        ...prev,
-        reviewed: prev.reviewed + 1,
-        again: prev.again + statsUpdate.again,
-        hard: prev.hard + statsUpdate.hard,
-        good: prev.good + statsUpdate.good,
-        easy: prev.easy + statsUpdate.easy,
-      }))
+      const finalStats = {
+        totalCards: sessionStats.reviewed + 1,
+        again: sessionStats.again + statsUpdate.again,
+        hard: sessionStats.hard + statsUpdate.hard,
+        good: sessionStats.good + statsUpdate.good,
+        easy: sessionStats.easy + statsUpdate.easy,
+      }
 
-      // Session complete - show summary
-      setSessionComplete(true)
+      // Calculate session duration in seconds
+      const endTime = Date.now()
+      const durationSeconds = Math.floor((endTime - startTime) / 1000)
+
+      // Redirect to dashboard with session stats
+      router.push(
+        `/dashboard?completed=true&totalCards=${finalStats.totalCards}&again=${finalStats.again}&hard=${finalStats.hard}&good=${finalStats.good}&easy=${finalStats.easy}&duration=${durationSeconds}`
+      )
     } catch (error) {
       console.error('Failed to save card:', error)
-      alert('Failed to save rating. Please try again.')
+      alert('Không thể lưu kết quả. Vui lòng thử lại.')
       setIsProcessing(false)
     }
   }

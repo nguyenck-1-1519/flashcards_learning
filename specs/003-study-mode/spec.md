@@ -44,38 +44,39 @@ While studying, a user views the front of a flashcard (question/prompt) and clic
 
 ### User Story 3 - Rate Card and Navigate Session (Priority: P1)
 
-After viewing the answer, a user rates how well they remembered the card by selecting Again (didn't remember), Hard (barely remembered), Good (remembered), or Easy (remembered easily). They then use the Next button to proceed to the next card.
+After viewing the answer, a user rates how well they remembered the card by selecting Again (didn't remember), Hard (barely remembered), Good (remembered), or Easy (remembered easily). After selecting a rating, the Next button becomes enabled. When clicked, the system saves the rating and advances to the next card's front side.
 
 **Why this priority**: Difficulty rating is essential for the spaced repetition algorithm to work. Without ratings, the app cannot schedule cards effectively.
 
-**Independent Test**: Can be tested by flipping a card, selecting a rating, clicking Next, and verifying the card is scheduled according to SM-2 algorithm and next card appears.
+**Independent Test**: Can be tested by flipping a card, selecting a rating, clicking Next, and verifying the card is scheduled according to SM-2 algorithm and next card's front side appears unflipped.
 
 **Acceptance Scenarios**:
 
-1. **Given** user sees card back with rating buttons, **When** they click any rating (Again/Hard/Good/Easy), **Then** the rating is recorded and "Next" button becomes enabled at the bottom
-2. **Given** user has selected a rating, **When** they click "Next" button, **Then** card's review schedule is updated using SM-2 algorithm and next card front is displayed
-3. **Given** user is on first card, **When** they rate and click Next, **Then** second card appears showing its front side (not flipped)
-4. **Given** user rates a card, **When** Next is clicked, **Then** card's last_reviewed timestamp is updated and next_review date is calculated
+1. **Given** user sees card back with rating buttons, **When** they click any rating (Again/Hard/Good/Easy), **Then** the rating is highlighted and "Next" button becomes enabled at the bottom
+2. **Given** user has selected a rating, **When** they click "Next" button, **Then** card's review schedule is updated using SM-2 algorithm and saved to database
+3. **Given** Next button is clicked, **When** processing completes, **Then** next card appears showing its front side (not flipped, card state is reset)
+4. **Given** user advances to next card, **When** new card displays, **Then** rating selection is cleared and Next button returns to disabled state
 5. **Given** user is on mobile, **When** rating buttons appear, **Then** they are large enough (44x44px minimum) and clearly labeled with colors (Again=red, Hard=orange, Good=green, Easy=blue)
-6. **Given** user has not selected a rating yet, **When** viewing card back, **Then** Next button is disabled (grayed out)
+6. **Given** user has not selected a rating yet, **When** viewing card back, **Then** Next button is disabled (grayed out with reduced opacity)
+7. **Given** user selects a rating, **When** before clicking Next, **Then** they can change their rating selection (visual highlight updates accordingly)
 
 ---
 
 ### User Story 4 - Complete Study Session (Priority: P2)
 
-After reviewing all cards in the session (up to 10 cards), the user clicks a "Complete" button on the last card to finish the session and see their performance summary.
+After reviewing all cards in the session (up to 10 cards), the user clicks a "Complete" button on the last card to finish the session. The system saves all progress and returns the user to the dashboard with a congratulatory pop-up.
 
 **Why this priority**: Session completion provides closure and feedback but is less critical than the core study flow. Users can still learn without detailed statistics.
 
-**Independent Test**: Can be tested by completing a full study session of cards, clicking Complete on the last card, and verifying the summary screen appears with correct statistics.
+**Independent Test**: Can be tested by completing a full study session of cards, clicking Complete on the last card, and verifying the user is redirected to dashboard with a congratulatory pop-up.
 
 **Acceptance Scenarios**:
 
-1. **Given** user is on the last card of the session, **When** they select a rating, **Then** "Complete" button appears instead of "Next" button
-2. **Given** user clicks "Complete" button, **When** clicked, **Then** all rated cards are saved with their SM-2 schedules and session summary screen appears
-3. **Given** session summary appears, **When** displayed, **Then** it shows total cards studied (max 10), breakdown by rating (X Again, Y Hard, Z Good, W Easy), and total study time
-4. **Given** session is complete, **When** user views summary, **Then** they see "Return to Deck" button to navigate back to deck detail page
-5. **Given** session is complete, **When** summary shows, **Then** congratulatory message appears "Great work! You've reviewed [X] cards."
+1. **Given** user is on the last card of the session, **When** they select a rating, **Then** "Complete" button appears instead of "Next" button and becomes enabled
+2. **Given** user clicks "Complete" button, **When** clicked, **Then** the final card is saved with SM-2 schedule and user is redirected to dashboard
+3. **Given** user returns to dashboard after completing session, **When** page loads, **Then** a congratulatory pop-up appears with message "Chúc mừng! Bạn đã hoàn thành [X] thẻ!" (Congratulations! You've completed [X] cards!)
+4. **Given** congratulatory pop-up appears, **When** displayed, **Then** it shows session statistics: total cards studied (max 10), breakdown by rating (Again/Hard/Good/Easy counts), and total study time
+5. **Given** user sees congratulatory pop-up, **When** they click "OK" or close button, **Then** pop-up dismisses and user remains on dashboard
 
 ---
 
@@ -114,17 +115,21 @@ After reviewing all cards in the session (up to 10 cards), the user clicks a "Co
 ---
 
 ### Edge Cases
-clicks card multiple times rapidly during flip? (Prevent double-flip with animation lock)
+
+- What happens when user clicks card multiple times rapidly during flip? (Prevent double-flip with animation lock)
 - What happens when user tries to select rating before card is flipped? (Rating buttons only appear after flip animation completes)
 - What happens when card content is very long and doesn't fit on screen? (Make card area scrollable while keeping rating buttons and Next/Complete button visible)
-- What happens when user accidentally clicks wrong rating button? (No undo in v1, rating is recorded and user must click Next to proceed)
+- What happens when user changes their mind about rating selection? (Allow clicking different rating button before clicking Next, visual highlight updates)
 - What happens when user clicks Next before selecting a rating? (Next button remains disabled until a rating is selected)
+- What happens when user is on last card and selects rating? (Complete button appears enabled instead of Next button)
+- What happens when Complete button is clicked? (Final card is saved with SM-2 schedule, user redirected to dashboard with congratulatory pop-up)
+- What happens when network fails during Complete action? (Show error message, keep user on study page, allow retry)
+- What happens when user closes congratulatory pop-up on dashboard? (Pop-up dismisses, user remains on dashboard viewing their decks)
 - What happens when markdown on card fails to render? (Show error message "Error rendering card content" with raw text fallback)
 - What happens on very small screens when rating buttons don't fit? (Stack buttons vertically maintaining 44px minimum height)
 - What happens when deck has only 1 card? (Session proceeds normally with "Card 1 of 1", Complete button appears after rating)
 - What happens when user starts multiple study sessions in quick succession? (Each session is independent with random card selection up to 10 cards)
-- What happens when user navigates away during study session without clicking Exit? (Progress autosaves for rated cards when page unloadsck)
-- What happens on very small screens when rating buttons don't fit? (Stack buttons vertically maintaining 44px minimum height)
+- What happens when user navigates away during study session without clicking Exit? (Progress autosaves for rated cards when page unloads)
 
 ## Requirements
 
@@ -137,9 +142,12 @@ randomly select maximum 10 cards when user starts study session
 - **FR-006**: System MUST animate card flip transition (180-degree rotation, 300ms duration)
 - **FR-007**: System MUST render markdown content on both card front and back
 - **FR-008**: System MUST display rating buttons (Again/Hard/Good/Easy) only after card is flipped to back side
-- **FR-009**: System MUST display "Next" button below rating buttons after user selects a rating
-- **FR-010**: System MUST keep Next button disabled (grayed out) until user selects a rating
-- **FR-011**: System MUST display "Complete" button instead of "Next" button on the last card of session
+- **FR-009**: System MUST display "Next" button below rating buttons, initially disabled until user selects a rating
+- **FR-010**: System MUST enable Next button immediately when user selects any rating
+- **FR-011**: System MUST display "Complete" button instead of "Next" button on the last card of session, initially disabled until user selects a rating
+- **FR-012**: System MUST enable Complete button immediately when user selects a rating on the last card
+- **FR-013**: System MUST save card with SM-2 schedule and advance to next card's front side (unflipped) when Next is clicked
+- **FR-014**: System MUST reset rating selection and disable Next/Complete button when advancing to a new card
 - **FR-015**: System MUST implement SM-2 algorithm for scheduling card reviews based on user ratings
 - **FR-016**: System MUST initialize new cards with: ease factor = 2.5, interval = 0, repetitions = 0
 - **FR-017**: System MUST calculate next review date based on rating and current card state
@@ -159,13 +167,15 @@ randomly select maximum 10 cards when user starts study session
 - **FR-029**: System MUST randomize card selection for each new study session
 - **FR-030**: System MUST track progress: current card number and total cards in session (e.g., "Card 5 of 10")
 - **FR-031**: System MUST update progress indicator when user advances to next card
-- **FR-032**: System MUST display session summary when user clicks Complete button on last card
-- **FR-033**: System MUST calculate and display session statistics: total cards studied, rating breakdown (Again/Hard/Good/Easy counts), study duration
-- **FR-034**: System MUST provide "Return to Deck" button in session summary to navigate back to deck detail
-- **FR-035**: System MUST allow user to exit session early via Exit button in header with confirmation dialog
-- **FR-036**: System MUST save progress for all rated cards when user exits early (cards with ratings applied)
-- **FR-037**: System MUST handle empty deck state: display "No cards available" message with "Add Card" button
-- **FR-038**: System MUST autosave rated cards if user navigates away without proper exit (page unload event)
+- **FR-032**: System MUST redirect user to dashboard when user clicks Complete button on last card
+- **FR-033**: System MUST calculate session statistics: total cards studied, rating breakdown (Again/Hard/Good/Easy counts), study duration
+- **FR-034**: System MUST display congratulatory pop-up on dashboard after session completion with message "Chúc mừng! Bạn đã hoàn thành [X] thẻ!"
+- **FR-035**: System MUST show session statistics in congratulatory pop-up: total cards reviewed, rating breakdown, study time
+- **FR-036**: System MUST allow user to dismiss congratulatory pop-up via OK button or close icon
+- **FR-037**: System MUST allow user to exit session early via Exit button in header with confirmation dialog
+- **FR-038**: System MUST save progress for all rated cards when user exits early (cards with ratings applied)
+- **FR-039**: System MUST handle empty deck state: display "No cards available" message with "Add Card" button
+- **FR-040**: System MUST autosave rated cards if user navigates away without proper exit (page unload event)
 #### Ses39**: System MUST ensure rating buttons are minimum 44x44px touch targets on mobile
 - **FR-040**: System MUST use color coding for rating buttons: Again (red), Hard (orange), Good (green), Easy (blue)
 - **FR-041**: System MUST ensure Next and Complete buttons are clearly visible and accessible (44x44px minimum)
