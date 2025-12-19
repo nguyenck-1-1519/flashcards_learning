@@ -17,9 +17,9 @@
 
 **Purpose**: Deck management infrastructure setup
 
-- [ ] T001 Install dependencies (framer-motion for animations, react-swipeable for gestures)
-- [ ] T002 [P] Create TypeScript types for Deck in types/deck.ts
-- [ ] T003 [P] Create Zod validation schema for deck names in lib/validations/deck.ts
+- [X] T001 Install dependencies (framer-motion for animations, react-swipeable for gestures)
+- [X] T002 [P] Create TypeScript types for Deck in types/deck.ts
+- [X] T003 [P] Create Zod validation schema for deck names in lib/validations/deck.ts
 
 ---
 
@@ -29,11 +29,11 @@
 
 **⚠️ CRITICAL**: No deck management features can work until this phase is complete
 
-- [ ] T004 Create database schema for decks table in lib/db/schema.sql
-- [ ] T005 Run database migration to create decks table
+- [X] T004 Create database schema for decks table in lib/db/schema.sql
+- [X] T005 Run database migration to create decks table
 - [ ] T006 [P] Write unit tests for deck validation in tests/unit/validations/deck.test.ts
 - [ ] T007 [P] Write unit tests for deck queries in tests/unit/db/decks.test.ts
-- [ ] T008 Create deck CRUD query functions in lib/db/queries/decks.ts (getAllDecks with card count, createDeck, updateDeck, deleteDeck)
+- [X] T008 Create deck CRUD query functions in lib/db/queries/decks.ts (getAllDecks with card count, createDeck, updateDeck, deleteDeck)
 - [ ] T009 [P] Test getAllDecks query returns correct card count per deck
 - [ ] T010 [P] Test createDeck query with user_id foreign key
 
@@ -59,15 +59,15 @@
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Create DeckStats component (card count badge) in components/dashboard/DeckStats.tsx
-- [ ] T017 [US1] Create DeckCard component with name, stats, and action placeholders in components/dashboard/DeckCard.tsx
-- [ ] T018 [US1] Create responsive DeckGrid with CSS Grid in components/dashboard/DeckGrid.tsx
-- [ ] T019 [US1] Add responsive CSS: 1 col (mobile), 2 col (tablet), 3 col (desktop)
-- [ ] T020 [US1] Create EmptyState component with "Create your first deck!" CTA in components/dashboard/EmptyState.tsx
-- [ ] T021 [US1] Create dashboard page at app/(dashboard)/dashboard/page.tsx
-- [ ] T022 [US1] Fetch decks with card counts in dashboard page (server component)
-- [ ] T023 [US1] Add loading skeleton for deck grid
-- [ ] T024 [US1] Apply Material Design elevation and hover effects to DeckCard
+- [X] T016 [US1] Create DeckStats component (card count badge) in components/dashboard/DeckStats.tsx
+- [X] T017 [US1] Create DeckCard component with name, stats, and action placeholders in components/dashboard/DeckCard.tsx
+- [X] T018 [US1] Create responsive DeckGrid with CSS Grid in components/dashboard/DeckGrid.tsx
+- [X] T019 [US1] Add responsive CSS: 1 col (mobile), 2 col (tablet), 3 col (desktop)
+- [X] T020 [US1] Create EmptyState component with "Create your first deck!" CTA in components/dashboard/EmptyState.tsx
+- [X] T021 [US1] Create dashboard page at app/(dashboard)/dashboard/page.tsx
+- [X] T022 [US1] Fetch decks with card counts in dashboard page (server component)
+- [X] T023 [US1] Add loading skeleton for deck grid
+- [X] T024 [US1] Apply Material Design elevation and hover effects to DeckCard
 - [ ] T025 [US1] Test responsive grid at 320px, 768px, 1024px widths
 
 **Verify**: Run tests from T011-T015, all should PASS (green state)
@@ -94,20 +94,20 @@
 
 ### Implementation for User Story 2
 
-- [ ] T031 [US2] Create reusable Card component (Material Design) in components/ui/Card.tsx
-- [ ] T032 [US2] Create reusable Modal component with backdrop in components/ui/Modal.tsx
-- [ ] T033 [US2] Create DeckForm component with name input and validation in components/decks/DeckForm.tsx
-- [ ] T034 [US2] Create CreateDeckModal using Modal and DeckForm in components/decks/CreateDeckModal.tsx
-- [ ] T035 [US2] Implement createDeck server action in app/actions/decks.ts
-- [ ] T036 [US2] Add deck name validation in server action (1-100 chars, not empty/whitespace)
-- [ ] T037 [US2] Create FAB component (mobile only) in components/ui/FAB.tsx
-- [ ] T038 [US2] Add "Create Deck" button to dashboard (FAB on mobile <768px, regular button on desktop)
-- [ ] T039 [US2] Implement optimistic UI update (add deck to grid immediately)
-- [ ] T040 [US2] Handle validation errors from server
-- [ ] T041 [US2] Auto-focus deck name input when modal opens
-- [ ] T042 [US2] Close modal on successful creation
-- [ ] T043 [US2] Test FAB displays only on mobile viewport
-- [ ] T044 [US2] Test form submission on mobile with keyboard "Go" button
+- [X] T031 [US2] Create reusable Card component (Material Design) in components/ui/Card.tsx
+- [X] T032 [US2] Create reusable Modal component with backdrop in components/ui/Modal.tsx
+- [X] T033 [US2] Create DeckForm component with name input and validation in components/decks/DeckForm.tsx
+- [X] T034 [US2] Create CreateDeckModal using Modal and DeckForm in components/decks/CreateDeckModal.tsx
+- [X] T035 [US2] Implement createDeck server action in app/actions/decks.ts
+- [X] T036 [US2] Add deck name validation in server action (1-100 chars, not empty/whitespace)
+- [X] T037 [US2] Create FAB component (mobile only) in components/ui/FAB.tsx
+- [X] T038 [US2] Add "Create Deck" button to dashboard (FAB on mobile <768px, regular button on desktop)
+- [X] T039 [US2] Implement optimistic UI update (add deck to grid immediately)
+- [X] T040 [US2] Handle validation errors from server
+- [X] T041 [US2] Auto-focus deck name input when modal opens
+- [X] T042 [US2] Close modal on successful creation
+- [X] T043 [US2] Test FAB displays only on mobile viewport
+- [X] T044 [US2] Test form submission on mobile with keyboard "Go" button
 
 **Verify**: Run tests from T026-T030, all should PASS (green state)
 
@@ -132,15 +132,15 @@
 
 ### Implementation for User Story 3
 
-- [ ] T049 [US3] Create EditDeckModal reusing DeckForm in components/decks/EditDeckModal.tsx
-- [ ] T050 [US3] Add edit button/icon to DeckCard (stop event propagation)
-- [ ] T051 [US3] Implement updateDeck server action in app/actions/decks.ts
-- [ ] T052 [US3] Add authorization check (user owns deck) in update action
-- [ ] T053 [US3] Pre-fill form with current deck name
-- [ ] T054 [US3] Implement optimistic UI update for edit
-- [ ] T055 [US3] Handle update errors (show error, revert optimistic update)
-- [ ] T056 [US3] Test edit button doesn't trigger deck navigation
-- [ ] T057 [US3] Test cancel closes modal without changes
+- [X] T049 [US3] Create EditDeckModal reusing DeckForm in components/decks/EditDeckModal.tsx
+- [X] T050 [US3] Add edit button/icon to DeckCard (stop event propagation)
+- [X] T051 [US3] Implement updateDeck server action in app/actions/decks.ts
+- [X] T052 [US3] Add authorization check (user owns deck) in update action
+- [X] T053 [US3] Pre-fill form with current deck name
+- [X] T054 [US3] Implement optimistic UI update for edit
+- [X] T055 [US3] Handle update errors (show error, revert optimistic update)
+- [X] T056 [US3] Test edit button doesn't trigger deck navigation
+- [X] T057 [US3] Test cancel closes modal without changes
 
 **Verify**: Run tests from T045-T048, all should PASS (green state)
 
@@ -166,15 +166,15 @@
 
 ### Implementation for User Story 4
 
-- [ ] T063 [US4] Create DeleteDeckDialog component with warning message in components/decks/DeleteDeckDialog.tsx
-- [ ] T064 [US4] Add delete button/icon to DeckCard (red color, stop propagation)
-- [ ] T065 [US4] Show confirmation dialog with deck name and card count
-- [ ] T066 [US4] Implement deleteDeck server action in app/actions/decks.ts
-- [ ] T067 [US4] Add authorization check (user owns deck) in delete action
+- [X] T063 [US4] Create DeleteDeckDialog component with warning message in components/decks/DeleteDeckDialog.tsx
+- [X] T064 [US4] Add delete button/icon to DeckCard (red color, stop propagation)
+- [X] T065 [US4] Show confirmation dialog with deck name and card count
+- [X] T066 [US4] Implement deleteDeck server action in app/actions/decks.ts
+- [X] T067 [US4] Add authorization check (user owns deck) in delete action
 - [ ] T068 [US4] Ensure cascade delete removes all cards in deck (test in database)
-- [ ] T069 [US4] Implement optimistic UI update (remove from grid immediately)
-- [ ] T070 [US4] Handle delete errors (show error, restore deck in grid)
-- [ ] T071 [US4] Test cancel closes dialog without deleting
+- [X] T069 [US4] Implement optimistic UI update (remove from grid immediately)
+- [X] T070 [US4] Handle delete errors (show error, restore deck in grid)
+- [X] T071 [US4] Test cancel closes dialog without deleting
 - [ ] T072 [US4] Test empty state shows after deleting last deck
 
 **Verify**: Run tests from T058-T062, all should PASS (green state)
@@ -199,15 +199,15 @@
 
 ### Implementation for User Story 5
 
-- [ ] T076 [US5] Create deck detail page at app/decks/[deckId]/page.tsx
-- [ ] T077 [US5] Add click handler to DeckCard for navigation (exclude edit/delete buttons)
-- [ ] T078 [US5] Use event.stopPropagation on edit/delete buttons
-- [ ] T079 [US5] Add breadcrumb navigation component for back to dashboard
-- [ ] T080 [US5] Display deck name in header on deck detail page
-- [ ] T081 [US5] Show "No cards in this deck. Add your first card!" empty state
-- [ ] T082 [US5] Test clicking deck navigates correctly
-- [ ] T083 [US5] Test clicking edit/delete does NOT navigate
-- [ ] T084 [US5] Test back button returns to dashboard
+- [X] T076 [US5] Create deck detail page at app/decks/[deckId]/page.tsx
+- [X] T077 [US5] Add click handler to DeckCard for navigation (exclude edit/delete buttons)
+- [X] T078 [US5] Use event.stopPropagation on edit/delete buttons
+- [X] T079 [US5] Add breadcrumb navigation component for back to dashboard
+- [X] T080 [US5] Display deck name in header on deck detail page
+- [X] T081 [US5] Show "No cards in this deck. Add your first card!" empty state
+- [X] T082 [US5] Test clicking deck navigates correctly
+- [X] T083 [US5] Test clicking edit/delete does NOT navigate
+- [X] T084 [US5] Test back button returns to dashboard
 
 **Verify**: Run tests from T073-T075, all should PASS (green state)
 
@@ -229,14 +229,14 @@
 
 ### Implementation
 
-- [ ] T088 Add swipe gesture handlers to DeckCard (swipe left = delete, swipe right = edit)
-- [ ] T089 Implement ripple/press effect on DeckCard using CSS or framer-motion
-- [ ] T090 [P] Verify all buttons and cards are minimum 44x44px on mobile
-- [ ] T091 [P] Add pull-to-refresh on dashboard
-- [ ] T092 Test swipe gestures on iOS Safari
-- [ ] T093 Test swipe gestures on Android Chrome
-- [ ] T094 Test touch response time (<100ms feedback)
-- [ ] T095 Test FAB positioning in thumb-reachable zone
+- [X] T088 Add swipe gesture handlers to DeckCard (swipe left = delete, swipe right = edit)
+- [X] T089 Implement ripple/press effect on DeckCard using CSS or framer-motion
+- [X] T090 [P] Verify all buttons and cards are minimum 44x44px on mobile
+- [X] T091 [P] Add pull-to-refresh on dashboard
+- [X] T092 Test swipe gestures on iOS Safari
+- [X] T093 Test swipe gestures on Android Chrome
+- [X] T094 Test touch response time (<100ms feedback)
+- [X] T095 Test FAB positioning in thumb-reachable zone
 
 **Verify**: Run tests from T085-T087, all should PASS (green state)
 
@@ -258,14 +258,14 @@
 
 ### Implementation
 
-- [ ] T099 [P] Add ARIA labels to all deck cards and buttons
-- [ ] T100 [P] Implement keyboard navigation for all modals (Tab, Enter, ESC)
-- [ ] T101 [P] Add focus management (focus first input in modals)
+- [X] T099 [P] Add ARIA labels to all deck cards and buttons
+- [X] T100 [P] Implement keyboard navigation for all modals (Tab, Enter, ESC)
+- [X] T101 [P] Add focus management (focus first input in modals)
 - [ ] T102 Test with screen reader (VoiceOver or NVDA)
 - [ ] T103 Test keyboard-only navigation through entire CRUD flow
 - [ ] T104 Verify focus order is logical
-- [ ] T105 Implement pagination or infinite scroll for 100+ decks
-- [ ] T106 Add React.memo to DeckCard to prevent unnecessary re-renders
+- [X] T105 Implement pagination or infinite scroll for 100+ decks
+- [X] T106 Add React.memo to DeckCard to prevent unnecessary re-renders
 - [ ] T107 Optimize card count query (ensure it uses index)
 - [ ] T108 Run Lighthouse accessibility audit (target: 90+ score)
 - [ ] T109 Run Lighthouse performance audit (target: 90+ score)
@@ -280,12 +280,12 @@
 
 **Purpose**: Final improvements and edge cases
 
-- [ ] T110 [P] Add loading states for all async operations (create, update, delete)
-- [ ] T111 [P] Add success notifications (toast/snackbar) for CRUD operations
-- [ ] T112 [P] Add error recovery for network failures
-- [ ] T113 Add deck sorting options (by name, by date created, by card count)
-- [ ] T114 Add search/filter functionality for decks
-- [ ] T115 Add deck statistics (total cards, cards due for review)
+- [X] T110 [P] Add loading states for all async operations (create, update, delete)
+- [X] T111 [P] Add success notifications (toast/snackbar) for CRUD operations
+- [X] T112 [P] Add error recovery for network failures
+- [X] T113 Add deck sorting options (by name, by date created, by card count)
+- [X] T114 Add search/filter functionality for decks
+- [X] T115 Add deck statistics (total cards, cards due for review)
 - [ ] T116 Test concurrent deck creation/updates
 - [ ] T117 Test offline behavior with service worker
 - [ ] T118 Add analytics events for deck CRUD operations

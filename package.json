@@ -9,24 +9,38 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "migrate": "tsx scripts/migrate.ts",
+    "migrate:sh": "./scripts/migrate.sh",
+    "test:db": "node scripts/test-connection.js",
+    "test:auth": "node scripts/test-auth.js",
+    "test:decks": "node scripts/test-deck-flow.js",
+    "test:nav": "node scripts/test-navigation.js"
   },
   "dependencies": {
+    "@types/pg": "^8.16.0",
+    "@vercel/postgres": "^0.8.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^17.2.3",
+    "framer-motion": "^12.23.26",
+    "highlight.js": "^11.11.1",
+    "isomorphic-dompurify": "^2.34.0",
+    "jose": "^5.2.0",
+    "marked": "^17.0.1",
     "next": "14.2.0",
+    "pg": "^8.16.3",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "bcryptjs": "^2.4.3",
-    "jose": "^5.2.0",
-    "zod": "^3.22.4",
-    "@vercel/postgres": "^0.8.0"
+    "react-swipeable": "^7.0.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/bcryptjs": "^2.4.6",
-    "typescript": "^5",
     "eslint": "^8",
-    "eslint-config-next": "14.2.0"
+    "eslint-config-next": "14.2.0",
+    "typescript": "^5"
   }
 }

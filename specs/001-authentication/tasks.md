@@ -30,7 +30,15 @@
 **⚠️ CRITICAL**: No authentication features can work until this phase is complete
 
 - [X] T004 Create database schema for users table in lib/db/schema.sql
-- [ ] T005 Run database migration to create users table
+- [ ] T004a Create migration script for database initialization in scripts/migrate.ts
+- [ ] T004b Add migration command to package.json scripts
+- [X] T004a Create migration script for database initialization in scripts/migrate.ts
+- [X] T004b Add migration command to package.json scripts (npm run migrate)
+- [X] T005 Setup Vercel Postgres database (create database on Vercel dashboard or CLI)
+- [X] T005a Configure DATABASE_URL in .env file with Vercel Postgres connection string
+- [X] T005b Verify database connection with test query
+- [X] T005c Run database migration to create users table: `npm run migrate` or `psql $DATABASE_URL -f lib/db/schema.sql`
+- [X] T005d Verify users table created successfully with SQL query: `SELECT * FROM users LIMIT 1;`
 - [X] T006 [P] Create Zod validation schemas in lib/auth/validation.ts (email, password rules)
 - [ ] T007 [P] Write unit tests for validation schemas in tests/unit/auth/validation.test.ts
 - [ ] T008 [P] Write unit tests for password hashing in tests/unit/auth/password.test.ts

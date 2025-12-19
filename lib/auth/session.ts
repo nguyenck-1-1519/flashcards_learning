@@ -42,7 +42,7 @@ export async function createSession(
 export async function verifySession(token: string): Promise<Session | null> {
   try {
     const verified = await jwtVerify(token, JWT_SECRET)
-    return verified.payload as Session
+    return verified.payload as unknown as Session
   } catch (error) {
     console.error('JWT verification error:', error)
     return null

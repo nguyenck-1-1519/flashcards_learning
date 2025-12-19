@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import './markdown.css'
+import 'highlight.js/styles/github.css'
 
 export const metadata: Metadata = {
   title: 'Flashcards Learning',
